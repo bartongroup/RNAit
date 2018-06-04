@@ -10,12 +10,37 @@ This is a reimplementation to replace the now offline original deployment
 
 ## Setting up a development instance
 
+bash 4 is required for helper scripts, whereas the MacOS default is 3.2, so grab a newer version with brew...
+
+```
+brew install bash
+```
+
+Create a conda environment, and add the RNAIT_ROOT variable to point to the location of the RNAit software....
+
 ```
 conda create -n RNAit
+mkdir -p ~/miniconda3/envs/RNAit/etc/conda/activate.d
+mkdir -p ~/miniconda3/envs/RNAit/etc/conda/deactivate.d
+echo '#!/bin/env bash' > ~/miniconda3/envs/RNAit/etc/conda/activate.d/vars.sh
+echo "export RNAIT_ROOT=/path/to/RNAIT/" >>  ~/miniconda3/envs/RNAit/etc/conda/activate.d/vars.sh
+echo '#!/bin/env bash' > ~/miniconda3/envs/RNAit/etc/conda/deactivate.d/vars.sh
+echo "unset RNAIT_ROOT" >>  ~/miniconda3/envs/RNAit/etc/conda/deactivate.d/vars.sh
 source activate RNAit
+```
+
+We need to install nginx and uwsgi from conda, and symlink the nginx config in place...
+```
 conda install nginx uwsgi
 mv $CONDA_PREFIX/etc/nginx/sites.d/default-site.conf $CONDA_PREFIX/etc/nginx/sites.d/default-site.conf.hiding
-ln -s [path_to_RNAit]/etc/nginx-site.conf $CONDA_PREFIX/etc/nginx/sites.d/ 
-bin/start_servers.sh
+ln -s ${RNAIT_ROOT}/etc/nginx-site.conf $CONDA_PREFIX/etc/nginx/sites.d/
 ```
+
+The nginx and uwsgi instances can be started and stopped using:
+```
+bin/start_servers.sh
+bin/stop_servers.sh
+```
+
+UWSGI can be made to reload the python scripts when these are modified by touching the 'reload' file within the uwsgi directory
 
