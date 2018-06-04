@@ -14,6 +14,8 @@ This is a reimplementation to replace the now offline original deployment
 conda create -n RNAit
 source activate RNAit
 conda install nginx uwsgi
+mv $CONDA_PREFIX/etc/nginx/sites.d/default-site.conf $CONDA_PREFIX/etc/nginx/sites.d/default-site.conf.hiding
+ln -s [path_to_RNAit]/etc/nginx-site.conf $CONDA_PREFIX/etc/nginx/sites.d/ 
 bin/start_servers.sh
 ```
 
