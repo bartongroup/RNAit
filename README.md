@@ -29,11 +29,11 @@ echo "unset RNAIT_ROOT" >>  ~/miniconda3/envs/RNAit/etc/conda/deactivate.d/vars.
 source activate RNAit
 ```
 
-We need to install nginx and uwsgi from conda, and symlink the nginx config in place...
+We need to install nginx,uwsgi,biopython and primer3 from conda, and symlink the nginx config in place...
 Nodejs is also required from conda...
 
 ```bash
-conda install nginx uwsgi nodejs
+conda install nginx uwsgi nodejs biopython primer3 primer3-py blast
 mv $CONDA_PREFIX/etc/nginx/sites.d/default-site.conf $CONDA_PREFIX/etc/nginx/sites.d/default-site.conf.hiding
 ln -s ${RNAIT_ROOT}/etc/nginx-site.conf $CONDA_PREFIX/etc/nginx/sites.d/
 ```
@@ -56,3 +56,19 @@ bin/stop_servers.sh
 
 UWSGI can be made to reload the python scripts when these are modified by touching the 'reload' file within the uwsgi directory
 
+## Setting up a production instance
+
+TODO: WriteMe!
+
+## Blast Databases
+
+Blast databases are based on non-repeat masked top-level ensembl distributions
+Databases have been obtained from the following sources:
+
+Leishmania major (lmajor): Ensembl Genomes release 39, Assembly ASM272v2
+Trypanosoma brucei (tbrucei): Ensembl Genomes release 39, Assembly TryBru_Apr2005_chr11
+
+Fasta format genome files should be uncompressed, symlinked or renamed to their short name and indexed using:
+```bash
+makeblastdb -dbtype nucl -title [shortname] -in [shortname]
+```
