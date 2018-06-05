@@ -20,7 +20,11 @@ def application (environ,start_response):
         return(encode)
     
     primers = get_primer_pairs(params)
-    
+    if (len(primers)==0):
+        html = 'No suitable primers found'
+        encode=html.encode('UTF-8')
+        return(encode)
+        
     html=''
     encode=html.encode('UTF-8')
         
