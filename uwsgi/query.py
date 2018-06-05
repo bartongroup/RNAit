@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 from cgi import parse_qs
+from Bio import SeqIO
+import io
+
 import cgitb
 cgitb.enable()
 
@@ -8,12 +11,29 @@ def application (environ,start_response):
     start_response('200 OK',[('Content-Type','text/html')])
     
     params = get_params(environ)
-    print(params)
-    
-    html = b'seqpaste:'
+    if ('error' in params):
+        html = params['error']
         
-    return [html]
+        encode=html.encode('UTF-8')
+        return(encode)
+    
+    html=''
+    encode=html.encode('UTF-8')
+        
+    return [encode]
 
+
+# get_params
+#
+# parses form parameters following form submission
+# Sequences entered via the 'seqpaste' field are parsed
+# as SeqRecord objects via SeqIO
+#
+# required args: environ - environment dictionary
+#
+# returns: params - dictionary of parsed parameters
+            
+# TODO: validation of submitted values
 
 def get_params(environ):
     
@@ -27,17 +47,14 @@ def get_params(environ):
     params={}
     for key in d.keys():
         val = d.get(key,[''])[0].decode("utf-8")
-        params[key.decode("utf-8")]=val
+        if (key.decode("utf-8")=='seqpaste'):
+            seqH = io.StringIO(val)
+            try:
+                record = SeqIO.read(seqH,'fasta')
+                params['seq']=record
+            except ValueError:
+                params['error']='The entered sequence does not appear to be valid fasta format'
+        else:
+            params[key.decode("utf-8")]=val
         
-    #seqpaste_val = d.get(b'seqpaste',[''])[0].decode("utf-8")
-    #print(seqpaste_val)f
-#    melting_temp = d.get('melting_temp',[''])[0]
-#    product_min = d.get('product_min',[''])[0]
- #   product_max = d.get('product_max',[''])[0]
-  #  string_min = d.get('string_min',[''])[0]
-   # string_max = d.get('string_max',[''])[0]
-    #subunit_length = d.get('subunit_length',[''])[0]
-  #  database = d.get('database',[''])[0]
-    
-    
     return(params)
