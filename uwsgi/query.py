@@ -2,6 +2,7 @@
 
 from cgi import parse_qs
 from Bio import SeqIO
+from Bio.Blast.Applications import NcbiblastnCommandline
 import io
 import primer3
 import pprint
@@ -19,11 +20,18 @@ def application (environ,start_response):
         encode=html.encode('UTF-8')
         return(encode)
     
+    seq = params.get('seq')
+    db = params.get('database')
     primers = get_primer_pairs(params)
+    
     if (len(primers)==0):
         html = 'No suitable primers found'
         encode=html.encode('UTF-8')
         return(encode)
+    
+    for pair in primers:
+        product=get_pcr_product(seq,pair)
+#        result=blast_product(product,db)
         
     html=''
     encode=html.encode('UTF-8')
@@ -113,3 +121,26 @@ def get_primer_pairs(params):
         pairs.append(pair)
         
     return(pairs)
+
+# get_pcr_product
+#
+# Isolates the subsequence represnting the pcr product for a primer pair
+#
+# required args: seq - Bio.seqRecord object
+#                pair - dictionary of primer pair info
+#
+# returns: product -  Bio.seqRecord object
+
+def get_pcr_product(seq,pair):
+    
+    #both primer3 and biopython use 0 based co-ordinates so we should be good to go....
+    start=pair.get('LEFT_START')
+    end=pair.get('RIGHT_START')+1
+    product=seq[start:end]
+    return()
+
+     
+    
+
+
+
