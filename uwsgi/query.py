@@ -3,15 +3,20 @@
 from cgi import parse_qs
 from Bio import SeqIO
 from Bio.Blast.Applications import NcbiblastnCommandline
+from Bio.Blast import NCBIXML
+from tempfile import mkdtemp
 import io
+import re
 import primer3
 import pprint
+import shutil
 
 import cgitb
 cgitb.enable()
 
 def application (environ,start_response):
     start_response('200 OK',[('Content-Type','text/html')])
+    pp=pprint.PrettyPrinter(indent=4)
     
     params = get_params(environ)
     if ('error' in params):
@@ -28,10 +33,9 @@ def application (environ,start_response):
         html = 'No suitable primers found'
         encode=html.encode('UTF-8')
         return(encode)
-    
     for pair in primers:
         product=get_pcr_product(seq,pair)
-#        result=blast_product(product,db)
+        blast_results=blast_product(product,db)
         
     html=''
     encode=html.encode('UTF-8')
@@ -137,9 +141,68 @@ def get_pcr_product(seq,pair):
     start=pair.get('LEFT_START')
     end=pair.get('RIGHT_START')+1
     product=seq[start:end]
-    return()
+    return(product)
 
-     
+# blast_product
+#
+# Blasts pcr product against organism genome database to identify
+#
+# required args: product - Bio:seqRecord object representing pcr product
+#                db - blast database name
+#
+# returns: blast_data - dictionary containing 'record' (blast_record object),
+#           alignment_status (status of each alignment [same,conflicting,ok])
+#           status ([bad/suitable])
+
+def blast_product(product,db):
+    tmpdir=mkdtemp(dir='../tmp')
+    queryFileName=tmpdir+'/query'
+    outFileName=tmpdir+'/output.xml'
+    
+    SeqIO.write(product,queryFileName,'fasta')
+    cline = NcbiblastnCommandline(cmd='blastn', query=queryFileName, out=outFileName, outfmt=5, db='../databases/'+db, evalue=0.01)
+    stdout,stderr=cline()
+    
+    result_handle = open(outFileName)
+    status=''
+    
+    blast_record = NCBIXML.read(result_handle)
+    midline_regex=re.compile(r"\|{20,}") 
+    alignment_status=[]
+    for alignment in blast_record.alignments:
+        min_ident=1.00
+        status_set=0
+        conflicting=0
+        for hsp in alignment.hsps:
+            # check for matches of >20bp identity by checking for stretches of >20 '|' characters in the HSP midline
+            match=midline_regex.search(hsp.match)
+            match_len=match.end()-match.start()
+            ident=hsp.identities/hsp.align_length
+            if (ident>0.99):
+                alignment_status.append('same')
+                status_set=1
+            if (min_ident>ident and (ident>0.89 and ident<0.99)):
+                min_ident=ident
+            
+        if ((min_ident>0.89 or match_len>20) and status_set==0):
+            alignment_status.append('conflicting: id='+str(min_ident*100)+'; identical stretch='+str(match_len))
+            conflicting=1
+        elif (status_set==0):
+            aligment_status.append('ok')
+            
+    if conflicting:
+        status='bad'
+    else:
+        status='suitable'
+    
+    blast_data={
+        'record': blast_record,
+        'alignment_status': alignment_status,
+        'primer_status': status
+        }
+    shutil.rmtree(tmpdir)
+    
+    return(blast_data)
     
 
 
