@@ -65,8 +65,8 @@ TODO: WriteMe!
 
 ## Blast Databases
 
-Blast databases are obtained where possible from non-repeat masked top-level
-ensembl distributions Each database has a 'short name' which is the blast
+Blast databases are obtained where possible from CDS sequences from
+ensembl distributions. Each database has a 'short name' which is the blast
 database name and is the value passed through the 'database' form parameter.
 
 Details on the databases are as follows:
@@ -76,7 +76,7 @@ Species | Short name | Assembly | Source
 Leishmania major | lmajor | ASM272v2 | Ensembl Genomes release 39 
 Trypanosoma brucei | tbrucei | TryBru_Apr2005_chr11 | Ensembl Genomes release 39 
 
-Fasta format genome files should be uncompressed, symlinked or renamed to their short name and indexed using:
+Fasta format CDS files should be uncompressed, symlinked or renamed to their short name and indexed using:
 ```bash
 makeblastdb -dbtype nucl -title [shortname] -in [shortname]
 ```
