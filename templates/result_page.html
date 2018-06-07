@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='row'>
+        <h1>RNAit: RNAi target selection for Trypanosome genomes</h1>
+        <div class='col-md-12'>
+          <h2>Results</h2>
+          {% for primer in primers %}
+          <div class='card'>
+            <div class='card-header '>
+              <button id='view{{ loop.index }}' class='btn btn-primary float-right' style='{% if loop.index!=1 %}display:inline{% else %}display:none{% endif %}' onclick='document.getElementById("primer{{ loop.index}}").style.display="block";document.getElementById("view{{ loop.index }}").style.display="none";document.getElementById("hide{{ loop.index }}").style.display="inline";'>View</button>
+              <button id='hide{{ loop.index }}' class='btn btn-primary float-right' style='{% if loop.index==1 %}display:inline{% else %}display:none{% endif %}' onclick='document.getElementById("primer{{ loop.index}}").style.display="none";document.getElementById("hide{{ loop.index }}").style.display="none";document.getElementById("view{{ loop.index }}").style.display="inline";'>Hide</button>
+              <h3 class='card-title left'>Primer pair {{ loop.index }}</h3>
+              <div class="alert {% if blast[loop.index-1].primer_status=='Suitable' %}alert-success{% else %}alert-danger{% endif %}">Primer status: {{ blast[loop.index-1].primer_status }}, Alignment status - {{blast[loop.index-1].alignment_status}}</div>
+            </div>
+            <div class='card-body' style='{% if loop.index==1 %}display:block{% else %}display:none{% endif %}' id='primer{{ loop.index }}'>
+              <div class='row'>
+                <div class='col-md-6'>
+                  Product size: {{ primer.PRODUCT_SIZE }} bp
+                </div>            
+                <div class='col-md-6'>
+                  Complementary ends: {{ primer.COMP_END }}
+                </div>            
+              </div>
+              <br/>
+              <div class='row'>
+                <div class='col-md-12'>
+                  <h5>Selected Region</h5>
+                  <div style='font-family:monospace'>{{ primer.PRODUCT|safe }}</div>
+                </div>
+              </div>
+              <br/>
+              <table class='table'>
+                <tr>
+                  <td>&nbsp;</td>
+                  <th>Left Primer</th>
+                  <th>Right Primer</th>
+                </tr>
+                <tr>
+                  <th>Sequence</th>
+                  <td>{{ primer.LEFT_SEQ }}</td>
+                  <td>{{ primer.RIGHT_SEQ }}</td>
+                </tr>
+                <tr>
+                  <th>Position</th>
+                  <td>{{ primer.LEFT_START }}</td>
+                  <td>{{ primer.RIGHT_START }} </td>
+                </tr>
+                <tr>
+                  <th>Length</th>
+                  <td>{{ primer.LEFT_LENGTH }} bp</td>
+                  <td>{{ primer.RIGHT_LENGTH }} bp</td>
+                </tr>
+                <tr>
+                  <th>TM</th>
+                  <td>{{ primer.LEFT_MELTING }} ºC</td>
+                  <td>{{ primer.RIGHT_MELTING }} ºC</td>
+                </tr>
+                <tr>
+                  <th>GC Content</th>
+                  <td>{{ primer.LEFT_GC }} %</td>
+                  <td>{{ primer.RIGHT_GC }} %</td>
+                </tr>
+              </table>
+            </div>
+          </div> <!--card-->
+          <br/>
+          {% endfor %}
+        </div> <!--col-md-12-->
+      </div> <!--row-->
+    </div><!--container-->
+  </body>
+</html>

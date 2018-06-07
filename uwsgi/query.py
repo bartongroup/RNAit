@@ -10,6 +10,8 @@ import re
 import primer3
 import pprint
 import shutil
+import textwrap
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 import cgitb
 cgitb.enable()
@@ -28,6 +30,7 @@ def application (environ,start_response):
     seq = params.get('seq')
     db = params.get('database')
     primers = get_primer_pairs(params)
+    blast_results=[]
     
     if (len(primers)==0):
         html = 'No suitable primers found'
@@ -35,13 +38,13 @@ def application (environ,start_response):
         return(encode)
     for pair in primers:
         product=get_pcr_product(seq,pair)
-        blast_results=blast_product(product,db)
+        blast_result=blast_product(product,db)
+        blast_results.append(blast_result)
         
-    html=''
+    html=get_output_page(primers,blast_results)
     encode=html.encode('UTF-8')
         
     return [encode]
-
 
 # get_params
 #
@@ -106,6 +109,8 @@ def get_primer_pairs(params):
     pair_count = int(primers.get('PRIMER_PAIR_NUM_RETURNED'))
     pairs=[]
     for i in range(pair_count):
+        formatted_product=get_formatted_product(str(params.get('seq').seq),primers,i)
+        
         pair={
             'LEFT_START':(primers.get('PRIMER_LEFT_'+str(i)))[0],
             'LEFT_LENGTH':(primers.get('PRIMER_LEFT_'+str(i)))[1],
@@ -115,16 +120,64 @@ def get_primer_pairs(params):
             'RIGHT_SEQ': primers.get('PRIMER_RIGHT_'+str(i)+'_SEQUENCE'),
             'LEFT_GC': primers.get('PRIMER_LEFT_'+str(i)+'_GC_PERCENT'),
             'RIGHT_GC': primers.get('PRIMER_RIGHT_'+str(i)+'_GC_PERCENT'),
-            'LEFT_MELTING': primers.get('PRIMER_LEFT_'+str(i)+'_TM'),
-            'RIGHT_MELTING': primers.get('PRIMER_RIGHT_'+str(i)+'_TM'),
+            'LEFT_MELTING': "%.2f" % primers.get('PRIMER_LEFT_'+str(i)+'_TM'),
+            'RIGHT_MELTING': "%.2f" % primers.get('PRIMER_RIGHT_'+str(i)+'_TM'),
             'LEFT_END_STAB': primers.get('PRIMER_LEFT_'+str(i)+'_END_STABILITY'),
             'RIGHT_END_STAB': primers.get('PRIMER_RIGHT_'+str(i)+'_END_STABILITY'),
             'PRODUCT_SIZE': primers.get('PRIMER_PAIR_'+str(i)+'_PRODUCT_SIZE'),
             'COMP_END': primers.get('PRIMER_PAIR_'+str(i)+'_COMPL_END'),
+            'PRODUCT': formatted_product,
         }
         pairs.append(pair)
         
     return(pairs)
+
+# get_formatted_product
+#
+# Adds HTML highlighting to region of sequence to be amplified by primers
+#
+# required args: seq - sequence
+#                primers - dictionary of primers returned from primer3.binding.designPrimers
+#                i - index of primer pair to use
+#
+# returns: formatted_seq - sequence with html formatting applied
+
+def get_formatted_product(seq,primers,i):
+    
+    start=(primers.get('PRIMER_LEFT_'+str(i)))[0]
+    end=(primers.get('PRIMER_RIGHT_'+str(i)))[0]
+        
+    lines=textwrap.wrap(seq,width=60)
+    count=0;
+    formatted_seq=''
+    for line in lines:
+        max_length=count+60
+        line_start=count
+        count=count+len(line)
+        num_spaces=max_length-count+4
+        spaces='&nbsp;' * num_spaces
+        
+        # add a <span> at the beginning of the product
+        if(start>line_start and start<count):
+            offset=start-line_start
+            left_flank=line[:offset]
+            product=line[offset:]
+            line="%s%s%s%s" % (left_flank,'<span style="color:red">',product,'</span>')
+        
+        # wrap lines completely within product in <span>s
+        if(end>line_start and start<line_start and end>count):
+            line="%s%s%s" % ('<span style="color:red">',line,'</span>')
+                
+        # add a <span> around the end of the product
+        if(end>line_start and end<=count):
+            offset=end-line_start
+            product=line[:offset+1]
+            right_flank=line[offset+1:]
+            line="%s%s%s%s" % ('<span style="color:red">',product,'</span>',right_flank)
+            
+        formatted_seq = "%s%s%s%s<br/>" % (formatted_seq,line,spaces,count)
+            
+    return(formatted_seq)
 
 # get_pcr_product
 #
@@ -168,7 +221,7 @@ def blast_product(product,db):
     
     blast_record = NCBIXML.read(result_handle)
     midline_regex=re.compile(r"\|{20,}") 
-    alignment_status=[]
+    alignment_status=''
     for alignment in blast_record.alignments:
         min_ident=1.00
         status_set=0
@@ -179,21 +232,21 @@ def blast_product(product,db):
             match_len=match.end()-match.start()
             ident=hsp.identities/hsp.align_length
             if (ident>0.99):
-                alignment_status.append('same')
+                alignment_status='Same'
                 status_set=1
             if (min_ident>ident and (ident>0.89 and ident<0.99)):
                 min_ident=ident
             
         if ((min_ident>0.89 or match_len>20) and status_set==0):
-            alignment_status.append('conflicting: id='+str(min_ident*100)+'; identical stretch='+str(match_len))
+            alignment_status="Conflicting: Identity=%.2f %%; Identical stretch=%d bp" % (min_ident*100,match_len)
             conflicting=1
         elif (status_set==0):
-            aligment_status.append('ok')
+            aligment_status='Good'
             
     if conflicting:
-        status='bad'
+        status='Bad'
     else:
-        status='suitable'
+        status='Suitable'
     
     blast_data={
         'record': blast_record,
@@ -204,6 +257,21 @@ def blast_product(product,db):
     
     return(blast_data)
     
+# get_output_page
+#
+# Generates HTML output based on jinja template 
+#
+# required args: primers - dictionary of primers produced by get_primer_pairs
+#                blast_data - dictionary of blast results generated by blast_product
+#
+# returns: page - HTML page
 
+def get_output_page(primers,blast_results):
+    env = Environment(
+        loader=FileSystemLoader('../templates'),autoescape=select_autoescape(['html','xml'])
+    )
+    template=env.get_template('result_page.html')
+    html=template.render(primers=primers,blast=blast_results)
+    return(html)
 
 
