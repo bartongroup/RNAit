@@ -46,98 +46,105 @@
             
             <p>&nbsp;</p>
             
-            <div class='card'>
-                <h2 class='card-header'>Primer Selection</h2>
-                <div class='card-body'>
-                  <div class='form-group row'>
-                    <label class='col-md-3 col-form-label' for='melting_temp' aria-describedby='melting_temp_info'>
-                        Melting temperature (˚C)
-                    </label>
-                    <div class='col-md-4'>
-                      <small id='melting_temp_info'>Required melting temperature of primer pair</small>
-                      <input type='range' id='melting_temp' name='melting_temp' class='form-contol col' min='50' max='75' value='60' oninput='melting_temp_out.value=melting_temp.value + "˚C"'/>
-                      <output id='melting_temp_out'>60˚C</output>
-                    </div>
-                  </div>
-                  <div class='form-group row'>
-                    <div class='col-md-3 col-form-label'>PCR product size</div>
-                    <div class='col-md-4'>
-                      <small id='product_min_info'>Minimum product size (bp)</small>
-                      <input type='text' id='product_min' name='product_min' aria-describedby='product_min_info' class='form-control col' value='400'/>
-                    </div>
-                    <div class='col-md-4'>
-                      <small id='product_max_info'>Maximum product size (bp)</small>
-                      <input type='text' id='product_max' name='product_max' aria-describedby='product_max_info' class='form-control col' value='600'/>
-                    </div>
-                  </div>
-                </div>
-            </div>
+            <div class='row'>
+              <div class='col-md-6'>
+                <div class='card'>
+                  <h2 class='card-header'>Primer Selection</h2>
+                  <div class='card-body'>
+                    <div class='form-group row'>
+                      <label class='col-md-3 col-form-label' for='melting_temp' aria-describedby='melting_temp_info'>
+                          Melting temperature (˚C)
+                      </label>
+                      <div class='col-md-6'>
+                        <small id='melting_temp_info'>Required melting temperature of primer pair</small>
+                        <input type='range' id='melting_temp' name='melting_temp' class='form-contol col' min='50' max='75' value='60' oninput='melting_temp_out.value=melting_temp.value + "˚C"'/>
+                        <output id='melting_temp_out'>60˚C</output>
+                      </div><!--col-md-6-->
+                    </div><!--form-group-row-->
+                    <div class='form-group row'>
+                      <div class='col-md-3 col-form-label'>PCR product size</div>
+                      <div class='col-md-4'>
+                        <small id='product_min_info'>Minimum product size (bp)</small>
+                        <input type='text' id='product_min' name='product_min' aria-describedby='product_min_info' class='form-control col' value='400'/>
+                      </div><!--col-md-4-->
+                      <div class='col-md-4'>
+                        <small id='product_max_info'>Maximum product size (bp)</small>
+                        <input type='text' id='product_max' name='product_max' aria-describedby='product_max_info' class='form-control col' value='600'/>
+                      </div><!--col-md-4-->
+                    </div><!--form-group row-->
+                  </div><!--card-body-->
+                </div><!--card-->
+              </div><!--col-md-6-->
+              
+              <div class='col-md-6'>
+                <div class='card'>
+                  <h2 class='card-header'>
+                    Blast Parameters
+                  </h2>
+                  <div class='card-body'>
+                    <div class='form-group row'>
+                      <div class='col-md-3 col-form-label'>Stringency</div>
+                        <div class='col-md-4'>
+                          <small id='string_min_info'>Minimum blast similarity (%)</small>
+                          <input type='range' id='string_min' name='string_min' aria-describedby='string_min_info' class='form-control col' min='80' max='99' value='80' oninput='string_min_out.value=string_min.value;'/>
+                          <output id='string_min_out'>80</output>
+                        </div>
+                        <div class='col-md-4'>
+                          <small id='string_max_info'>Maximum blast similarity (%)</small>
+                          <input type='range' id='string_max' name='string_max' aria-describedby='string_max_info' class='form-control col' min='80' max='99' value='99'  oninput='string_max_out.value=string_max.value;'/>
+                          <output id='string_max_out'>99</output>
+                        </div>
+                    </div> <!-- row -->
+                    <div class='form-group row'>
+                      <label class='col-md-3 col-form-label' for='subunit_length' aria-describedby='subunit_length_info'>Subunit length (bp)</label>
+                      <div class='col-md-9'>
+                        <small id='subunit_length_info'>Minimum length of conflicting sequence</small>
+                        <select class='form-control' id='subunit_length' name='subunit_length'>
+                          <option>15</option>
+                          <option>16</option>
+                          <option>17</option>
+                          <option>18</option>
+                          <option>19</option>
+                          <option selected='selected'>20</option>
+                          <option>21</option>
+                          <option>22</option>
+                          <option>23</option>
+                          <option>24</option>
+                          <option>25</option>
+                        </select>
+                      </div> <!--col-md-4-->
+                    </div><!--form-group row-->
+                    <div class='form-group row'>
+                      <label class='col-md-3 col-form-label' for='database' aria-describedby='database_info'>Database</label>
+                      <div class='col-md-9'>
+                        <small id='database_info'>Select organism for RNAi target design</small>
+                        <select class='form-control' id='database' name='database' size='1' required>
+                          <option value=''>Please select...</option>
+                          <option value='tbrucei'>Trypanosoma brucei</option>
+                          <!--<option value='tgondii'>Taxoplasma gondii</option>-->
+                          <option value='lmajor'>Leishmania major</option>
+                          <!--<option value='bmalayi'>Brugia malayi</option>-->
+                        </select>
+                        <div class='invalid-feedback'>Please select a database</div>
+                      </div> <!--col-md-4-->
+                    </div><!--form-group row-->
+                  </div><!--card-body-->
+                </div><!--card-->
+              </div> <!--col-md-6-->
             
-            <p>&nbsp;</p>
-            
-            <div class='card'>
-              <h2 class='card-header'>
-                Blast Parameters
-              </h2>
-              <div class='card-body'>
-                <div class='form-group row'>
-                  <div class='col-md-3 col-form-label'>Stringency</div>
-                  <div class='col-md-4'>
-                    <small id='string_min_info'>Minimum blast similarity (%)</small>
-                    <input type='range' id='string_min' name='string_min' aria-describedby='string_min_info' class='form-control col' min='80' max='99' value='80' oninput='string_min_out.value=string_min.value;'/>
-                    <output id='string_min_out'>80</output>
-                  </div>
-                  <div class='col-md-4'>
-                    <small id='string_max_info'>Maximum blast similarity (%)</small>
-                    <input type='range' id='string_max' name='string_max' aria-describedby='string_max_info' class='form-control col' min='80' max='99' value='99'  oninput='string_max_out.value=string_max.value;'/>
-                    <output id='string_max_out'>99</output>
-                  </div>
-                </div>
-                <div class='form-group row'>
-                  <label class='col-md-3 col-form-label' for='subunit_length' aria-describedby='subunit_length_info'>Subunit length (bp)</label>
-                  <div class='col-md-4'>
-                    <small id='subunit_length_info'>Minimum length of conflicting sequence</small>
-                    <select class='form-control' id='subunit_length' name='subunit_length'>
-                      <option>15</option>
-                      <option>16</option>
-                      <option>17</option>
-                      <option>18</option>
-                      <option>19</option>
-                      <option selected='selected'>20</option>
-                      <option>21</option>
-                      <option>22</option>
-                      <option>23</option>
-                      <option>24</option>
-                      <option>25</option>
-                    </select>
-                  </div>
-                </div>
-                <div class='form-group row'>
-                  <label class='col-md-3 col-form-label' for='database' aria-describedby='database_info'>Database</label>
-                  <div class='col-md-4'>
-                    <small id='database_info'>Select organism for RNAi target design</small>
-                    <select class='form-control' id='database' name='database' size='1' required>
-                      <option value=''>Please select...</option>
-                      <option value='tbrucei'>Trypanosoma brucei</option>
-                      <option value='tgondii'>Taxoplasma gondii</option>
-                      <option value='lmajor'>Leishmania major</option>
-                      <option value='bmalayi'>Brugia malayi</option>
-                    </select>
-                    <div class='invalid-feedback'>Please select a database</div>
-                  </div>
+              <p>&nbsp;</p>
+              <div class='form-group'>
+                <div class='col-md-9 col-md-offset-3'>
+                  <div id='messages'></div>
                 </div>
               </div>
-            </div>
-            
-            <p>&nbsp;</p>
-            <div class='form-group'>
-              <div class='col-md-9 col-md-offset-3'>
-                <div id='messages'></div>
+            </div> <!--row-->
+            <div class='form-group row'>
+              <div class='col-md-12'>
+                <button type='submit' class='btn btn-primary'>Submit</button>
+                <button type='reset' class='btn btn-secondary'>Reset</button>
               </div>
-            </div>
-            <button type='submit' class='btn btn-primary'>Submit</button>
-            <button type='reset' class='btn btn-secondary'>Reset</button>
-            
+            </div><!--row-->
           </form>
         </div>
       </div>
@@ -168,7 +175,7 @@
     });
   }, false);
 })();
-</script>
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   </body>
 </html>

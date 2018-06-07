@@ -25,52 +25,78 @@
               <div class='row'>
                 <div class='col-md-6'>
                   Product size: {{ primer.PRODUCT_SIZE }} bp
-                </div>            
+                </div> <!-- col-md-6 -->
                 <div class='col-md-6'>
                   Complementary ends: {{ primer.COMP_END }}
-                </div>            
-              </div>
+                </div> <!-- col-md-6 -->   
+              </div> <!--row-->
               <br/>
               <div class='row'>
                 <div class='col-md-12'>
                   <h5>Selected Region</h5>
                   <div style='font-family:monospace'>{{ primer.PRODUCT|safe }}</div>
-                </div>
-              </div>
+                </div> <!--col-md-12-->
+              </div> <!-- row -->
               <br/>
-              <table class='table'>
-                <tr>
-                  <td>&nbsp;</td>
-                  <th>Left Primer</th>
-                  <th>Right Primer</th>
-                </tr>
-                <tr>
-                  <th>Sequence</th>
-                  <td>{{ primer.LEFT_SEQ }}</td>
-                  <td>{{ primer.RIGHT_SEQ }}</td>
-                </tr>
-                <tr>
-                  <th>Position</th>
-                  <td>{{ primer.LEFT_START }}</td>
-                  <td>{{ primer.RIGHT_START }} </td>
-                </tr>
-                <tr>
-                  <th>Length</th>
-                  <td>{{ primer.LEFT_LENGTH }} bp</td>
-                  <td>{{ primer.RIGHT_LENGTH }} bp</td>
-                </tr>
-                <tr>
-                  <th>TM</th>
-                  <td>{{ primer.LEFT_MELTING }} ºC</td>
-                  <td>{{ primer.RIGHT_MELTING }} ºC</td>
-                </tr>
-                <tr>
-                  <th>GC Content</th>
-                  <td>{{ primer.LEFT_GC }} %</td>
-                  <td>{{ primer.RIGHT_GC }} %</td>
-                </tr>
-              </table>
-            </div>
+              <div class='row'>
+                <table class='table'>
+                  <tr>
+                    <td>&nbsp;</td>
+                    <th>Left Primer</th>
+                    <th>Right Primer</th>
+                  </tr>
+                  <tr>
+                    <th>Sequence</th>
+                    <td>{{ primer.LEFT_SEQ }}</td>
+                    <td>{{ primer.RIGHT_SEQ }}</td>
+                  </tr>
+                  <tr>
+                    <th>Position</th>
+                    <td>{{ primer.LEFT_START }}</td>
+                    <td>{{ primer.RIGHT_START }} </td>
+                  </tr>
+                  <tr>
+                    <th>Length</th>
+                    <td>{{ primer.LEFT_LENGTH }} bp</td>
+                    <td>{{ primer.RIGHT_LENGTH }} bp</td>
+                  </tr>
+                  <tr>
+                    <th>TM</th>
+                    <td>{{ primer.LEFT_MELTING }} ºC</td>
+                    <td>{{ primer.RIGHT_MELTING }} ºC</td>
+                  </tr>
+                  <tr>
+                    <th>GC Content</th>
+                    <td>{{ primer.LEFT_GC }} %</td>
+                    <td>{{ primer.RIGHT_GC }} %</td>
+                  </tr>
+                </table>
+              </div>
+              <hr>
+              <h4>Blast Results</h4>
+              <div class='row'>
+                <div class='col-md-6'>
+                  <h5>>99% identity</h5>
+                  <table class='table'>
+                    <tr><th>Description</th><th>Length</th></tr>
+                    {% for hit in blast[loop.index-1].self_alignments %}
+                      <td>{{ hit.description }}</td>
+                      <td>{{ hit.subj_length }}</td>
+                    {% endfor %}
+                  </table>              
+                </div> <!-- col-md-6-->
+                <div class='col-md-6'>
+                  <h5>80-99% identity</h5>
+                  <table class='table'>
+                    <tr><th>Description</th><th>Length</th></tr>
+                    {% for hit in blast[loop.index-1].conflicting_alignments %}
+                      <td>{{ hit.description }}</td>
+                      <td>{{ hit.subj_length }}</td>
+                    {% endfor %}
+                  </table>              
+                </div> <!-- col-md-6-->
+              </div> <!-- row -->
+            </div><!-- card-body -->
           </div> <!--card-->
           <br/>
           {% endfor %}
