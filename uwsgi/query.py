@@ -32,10 +32,8 @@ def application (environ,start_response):
     
     params = get_params(environ)
     if ('error' in params):
-        html = params['error']
-        
-        encode=html.encode('UTF-8')
-        return(encode)
+        print('found an error')
+        return(get_error_page(RNAit_dir,params.get('error')))
     
     seq = params.get('seq')
     db = ('%s%s' % (db_dir,params.get('database')))
@@ -52,9 +50,8 @@ def application (environ,start_response):
         blast_results.append(blast_result)
         
     html=get_output_page(primers,RNAit_dir,blast_results)
-    encode=html.encode('UTF-8')
         
-    return [encode]
+    return [html]
 
 # get_params
 #
@@ -295,6 +292,23 @@ def get_output_page(primers,RNAit_dir,blast_results):
     )
     template=env.get_template('result_page.html')
     html=template.render(primers=primers,blast=blast_results)
-    return(html)
+    encode=html.encode('UTF-8')
+    return(encode)
 
+# get_error_page
+#
+# Generates HTML error page based on jinga template
+#
+# required args: RNAit_dir - path to RNAit installation (string)
+#                error - Error message to render (string)
 
+def get_error_page(RNAit_dir,error):
+    print('in_get_error_page...')
+    env = Environment(
+        loader=FileSystemLoader(RNAit_dir+'/templates'),autoescape=select_autoescape(['html','xml'])
+    )
+    template=env.get_template('error_page.html')
+    html=template.render(error=error)
+    encode=html.encode('UTF-8')
+    return(encode)
+    
