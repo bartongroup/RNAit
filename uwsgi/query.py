@@ -4,6 +4,7 @@ from cgi import parse_qs
 from Bio import SeqIO
 from Bio.Blast.Applications import NcbiblastnCommandline
 from Bio.Blast import NCBIXML
+from Bio.Application import ApplicationError
 from tempfile import mkdtemp
 import io
 import re
@@ -32,21 +33,26 @@ def application (environ,start_response):
     
     params = get_params(environ)
     if ('error' in params):
-        print('found an error')
-        return(get_error_page(RNAit_dir,params.get('error')))
+        return(get_error_page(RNAit_dir,params.get('error'),'submission'))
     
     seq = params.get('seq')
     db = ('%s%s' % (db_dir,params.get('database')))
-    primers = get_primer_pairs(params)
-    blast_results=[]
+    primers,error = get_primer_pairs(params)
+    
+    if error:
+        return(get_error_page(RNAit_dir,error,'runtime'))
     
     if (len(primers)==0):
-        html = 'No suitable primers found'
+        return(get_error_page(RNAit_dir,'No suitable primers found','runtime'))
         encode=html.encode('UTF-8')
         return(encode)
+    
+    blast_results=[]
     for pair in primers:
         product=get_pcr_product(seq,pair)
-        blast_result=blast_product(product,tmp_dir,db)
+        blast_result,error=blast_product(product,tmp_dir,db)
+        if (error):
+            return(get_error_page(RNAit_dir,error,'runtime'))
         blast_results.append(blast_result)
         
     html=get_output_page(primers,RNAit_dir,blast_results)
@@ -83,7 +89,7 @@ def get_params(environ):
                 record = SeqIO.read(seqH,'fasta')
                 params['seq']=record
             except ValueError:
-                params['error']='The entered sequence does not appear to be valid fasta format'
+                params['error']='the entered sequence does not appear to be valid fasta format'
         else:
             params[key.decode("utf-8")]=val
         
@@ -97,6 +103,7 @@ def get_params(environ):
 # required args: params - dictionary of parsed form parameters
 #
 # returns: primers - list of primer pair dictionaries
+#          error - runtime error (string)
 
 def get_primer_pairs(params):
     
@@ -111,7 +118,11 @@ def get_primer_pairs(params):
         'PRIMER_OPT_TM': int(params.get('melting_temp')),
     }
     
-    primers=primer3.bindings.designPrimers(seq_args,global_args)
+    primers={}
+    try:
+        primers=primer3.bindings.designPrimers(seq_args,global_args)
+    except OSError as error:
+        return(primers,error)
     
     pair_count = int(primers.get('PRIMER_PAIR_NUM_RETURNED'))
     pairs=[]
@@ -137,7 +148,7 @@ def get_primer_pairs(params):
         }
         pairs.append(pair)
         
-    return(pairs)
+    return(pairs,None)
 
 # get_formatted_product
 #
@@ -210,9 +221,7 @@ def get_pcr_product(seq,pair):
 # required args: product - Bio:seqRecord object representing pcr product
 #                db - blast database name
 #
-# returns: blast_data - dictionary containing 'record' (blast_record object),
-#           alignment_status (status of each alignment [same,conflicting,ok])
-#           status ([bad/suitable])
+# returns: blast_data - dictionary containing 'record' (blast_record object), alignment status etc.
 
 def blast_product(product,tmp_dir,db):
     blast_dir=mkdtemp(dir=tmp_dir)
@@ -221,7 +230,12 @@ def blast_product(product,tmp_dir,db):
     
     SeqIO.write(product,queryFileName,'fasta')
     cline = NcbiblastnCommandline(cmd='blastn', query=queryFileName, out=outFileName, outfmt=5, db=db, evalue=0.01)
-    stdout,stderr=cline()
+    stderr=''
+    try:
+        stdout,stderr=cline()
+    except ApplicationError as err:
+        print("returning error: " + err.stderr)
+        return('',err.stderr)        
     
     result_handle = open(outFileName)
     status=''
@@ -275,7 +289,7 @@ def blast_product(product,tmp_dir,db):
         }
     shutil.rmtree(blast_dir)
     
-    return(blast_data)
+    return(blast_data,None)
     
 # get_output_page
 #
@@ -301,14 +315,15 @@ def get_output_page(primers,RNAit_dir,blast_results):
 #
 # required args: RNAit_dir - path to RNAit installation (string)
 #                error - Error message to render (string)
+#                type - submission or runtime (string)
+#                       'submission' error warns regaring invalid inputs
 
-def get_error_page(RNAit_dir,error):
-    print('in_get_error_page...')
+def get_error_page(RNAit_dir,error,type):
     env = Environment(
         loader=FileSystemLoader(RNAit_dir+'/templates'),autoescape=select_autoescape(['html','xml'])
     )
     template=env.get_template('error_page.html')
-    html=template.render(error=error)
+    html=template.render(error=error,type=type)
     encode=html.encode('UTF-8')
     return(encode)
     
