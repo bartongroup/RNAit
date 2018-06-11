@@ -9,14 +9,14 @@
     
     <title>RNAit</title>
   </head>
-  <body>
+  <body onload='set_default_vals()'>
     <div class='container'>
       <div class='row'>
         
         <div class='col-md-12'>
         <h1>RNAit: RNAi target selection for Trypanosome genomes</h1>
         <p><span style='font-weight: bold'>Citation: </span>Redmond <span style='font-style:oblique'>et al.</span> 2003, Mol. Biochem. Parasitol. 128:115-118. <a href=http://doi.org/doi:10.1016/S0166-6851(03)00045-8>doi:10.1016/S0166-6851(03)00045-8</a></p>
-          <form id='RNAit' method='POST' class='needs-validation' action='/RNAit/query.py' novalidate>
+          <form id='RNAit' method='POST' class='needs-validation' action='/RNAit/query.py' onreset='set_default_vals();' novalidate>
             <div class='card'>
               <h2 class='card-header'>
                 Sequence Input
@@ -86,7 +86,7 @@
                       <div class='col-md-3 col-form-label'>Stringency</div>
                         <div class='col-md-4'>
                           <small id='string_min_info'>Minimum blast similarity (%)</small>
-                          <input type='range' id='string_min' name='string_min' aria-describedby='string_min_info' class='form-control col' min='80' max='99' value='80' oninput='string_min_out.value=string_min.value;'/>
+                          <input type='range' id='string_min' name='string_min' aria-describedby='string_min_info' class='form-control col' min='80' max='99' value='80' oninput=';string_min_out.value=string_min.value'/>
                           <output id='string_min_out'>80</output>
                         </div>
                         <div class='col-md-4'>
@@ -175,6 +175,11 @@
     });
   }, false);
 })();
+ function set_default_vals() {
+  melting_temp_out.value=melting_temp.value + "ºC";
+  string_min_out.value=string_min.value;
+  string_max_out.value=string_max.value;
+}
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   </body>
