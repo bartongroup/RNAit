@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-from cgi import parse_qs
+#from cgi import parse_qs
+import cgi
 from Bio import SeqIO
 from Bio.Blast.Applications import NcbiblastnCommandline
 from Bio.Blast import NCBIXML
@@ -17,7 +18,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 import yaml
 
 import cgitb
-cgitb.enable(format='text')
+#cgitb.enable(format='text')
 
 def application (environ,start_response):
     start_response('200 OK',[('Content-Type','text/html')])
@@ -32,6 +33,7 @@ def application (environ,start_response):
     tmp_dir=config.get('tmp_dir')
     
     params = get_params(environ)
+    
     if ('error' in params):
         return(get_error_page(RNAit_dir,params.get('error'),'submission'))
     
@@ -69,29 +71,32 @@ def application (environ,start_response):
 #
 # returns: params - dictionary of parsed parameters
             
-# TODO: validation of submitted values
-
 def get_params(environ):
     
-    try:
-        request_body_size = int(environ.get('CONTENT_LENGTH',0))
-    except (ValueError):
-        request_body_size = 0
-    request_body = environ['wsgi.input'].read(request_body_size) 
-    d = parse_qs(request_body)
-    
+    pp=pprint.PrettyPrinter()
+    post_env = environ.copy()
+    post_env['QUERY_STRING']=''
+    post = cgi.FieldStorage(fp=environ['wsgi.input'],environ=post_env,keep_blank_values=True)
+
     params={}
-    for key in d.keys():
-        val = d.get(key,[''])[0].decode("utf-8")
-        if (key.decode("utf-8")=='seqpaste'):
-            seqH = io.StringIO(val)
+    for f in post.list:
+        if f.name=='seqpaste' and f.value!='': 
+            seqH = io.StringIO(f.value)
             try:
                 record = SeqIO.read(seqH,'fasta')
                 params['seq']=record
             except ValueError:
                 params['error']='the entered sequence does not appear to be valid fasta format'
+        elif f.name=='upload' and post.getvalue('seqpaste')=='':
+            raw_fasta=f.value.decode("utf-8")
+            seqH = io.StringIO(raw_fasta)
+            try:
+                record = SeqIO.read(seqH,'fasta')
+                params['seq']=record
+            except ValueError:
+                params['error']='the uploaded sequence does not appear to be valid fasta format'
         else:
-            params[key.decode("utf-8")]=val
+            params[f.name]=f.value
         
     return(params)
 
