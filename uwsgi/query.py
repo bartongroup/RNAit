@@ -11,14 +11,24 @@ import primer3
 import pprint
 import shutil
 import textwrap
+import os
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+import yaml
 
 import cgitb
-cgitb.enable()
+cgitb.enable(format='text')
 
 def application (environ,start_response):
     start_response('200 OK',[('Content-Type','text/html')])
     pp=pprint.PrettyPrinter(indent=4)
+    
+    config_file=(os.path.dirname(os.path.realpath(__file__)) + '/../etc/RNAit.yaml')
+    with open(config_file) as s:
+        config = yaml.safe_load(s)
+    
+    RNAit_dir=config.get('RNAit_dir')
+    db_dir=config.get('db_dir')
+    tmp_dir=config.get('tmp_dir')
     
     params = get_params(environ)
     if ('error' in params):
@@ -28,7 +38,7 @@ def application (environ,start_response):
         return(encode)
     
     seq = params.get('seq')
-    db = params.get('database')
+    db = ('%s%s' % (db_dir,params.get('database')))
     primers = get_primer_pairs(params)
     blast_results=[]
     
@@ -38,10 +48,10 @@ def application (environ,start_response):
         return(encode)
     for pair in primers:
         product=get_pcr_product(seq,pair)
-        blast_result=blast_product(product,db)
+        blast_result=blast_product(product,tmp_dir,db)
         blast_results.append(blast_result)
         
-    html=get_output_page(primers,blast_results)
+    html=get_output_page(primers,RNAit_dir,blast_results)
     encode=html.encode('UTF-8')
         
     return [encode]
@@ -207,13 +217,13 @@ def get_pcr_product(seq,pair):
 #           alignment_status (status of each alignment [same,conflicting,ok])
 #           status ([bad/suitable])
 
-def blast_product(product,db):
-    tmpdir=mkdtemp(dir='../tmp')
-    queryFileName=tmpdir+'/query'
-    outFileName=tmpdir+'/output.xml'
+def blast_product(product,tmp_dir,db):
+    blast_dir=mkdtemp(dir=tmp_dir)
+    queryFileName=blast_dir+'/query'
+    outFileName=blast_dir+'/output.xml'
     
     SeqIO.write(product,queryFileName,'fasta')
-    cline = NcbiblastnCommandline(cmd='blastn', query=queryFileName, out=outFileName, outfmt=5, db='../databases/'+db, evalue=0.01)
+    cline = NcbiblastnCommandline(cmd='blastn', query=queryFileName, out=outFileName, outfmt=5, db=db, evalue=0.01)
     stdout,stderr=cline()
     
     result_handle = open(outFileName)
@@ -222,10 +232,18 @@ def blast_product(product,db):
     blast_record = NCBIXML.read(result_handle)
     midline_regex=re.compile(r"\|{20,}") 
     alignment_status=''
+    self_alignments=[]
+    conflicting_alignments=[]
+    
     for alignment in blast_record.alignments:
         min_ident=1.00
         status_set=0
         conflicting=0
+        alignment_data={
+            'accession': alignment.hit_id,
+            'description': alignment.hit_def,
+            'subj_length': alignment.length,
+        }
         for hsp in alignment.hsps:
             # check for matches of >20bp identity by checking for stretches of >20 '|' characters in the HSP midline
             match=midline_regex.search(hsp.match)
@@ -234,12 +252,15 @@ def blast_product(product,db):
             if (ident>0.99):
                 alignment_status='Same'
                 status_set=1
+                self_alignments.append(alignment_data)
+                
             if (min_ident>ident and (ident>0.89 and ident<0.99)):
                 min_ident=ident
             
         if ((min_ident>0.89 or match_len>20) and status_set==0):
             alignment_status="Conflicting: Identity=%.2f %%; Identical stretch=%d bp" % (min_ident*100,match_len)
             conflicting=1
+            conflicting_alignments.append(alignment_data)
         elif (status_set==0):
             aligment_status='Good'
             
@@ -251,9 +272,11 @@ def blast_product(product,db):
     blast_data={
         'record': blast_record,
         'alignment_status': alignment_status,
-        'primer_status': status
+        'primer_status': status,
+        'self_alignments': self_alignments,
+        'conflicting_alignments': conflicting_alignments,
         }
-    shutil.rmtree(tmpdir)
+    shutil.rmtree(blast_dir)
     
     return(blast_data)
     
@@ -266,9 +289,9 @@ def blast_product(product,db):
 #
 # returns: page - HTML page
 
-def get_output_page(primers,blast_results):
+def get_output_page(primers,RNAit_dir,blast_results):
     env = Environment(
-        loader=FileSystemLoader('../templates'),autoescape=select_autoescape(['html','xml'])
+        loader=FileSystemLoader(RNAit_dir+'/templates'),autoescape=select_autoescape(['html','xml'])
     )
     template=env.get_template('result_page.html')
     html=template.render(primers=primers,blast=blast_results)

@@ -2,6 +2,6 @@
 
 source activate RNAit
 
-/Users/jabbott/miniconda3/envs/RNAit/bin/nginx &
-/Users/jabbott/miniconda3/envs/RNAit/bin/uwsgi --ini /Users/jabbott/Development/RNAit/etc/uwsgi.conf &
+${CONDA_PREFIX}/bin/nginx &
+${CONDA_PREFIX}/bin/uwsgi --ini ${RNAIT_ROOT}/etc/uwsgi.conf &
 

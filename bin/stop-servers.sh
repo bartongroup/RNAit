@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-source activate web
+source activate RNAit
 
-/Users/jabbott/miniconda3/envs/web/bin/nginx -s stop &
-/Users/jabbott/miniconda3/envs/web/bin/uwsgi --ini /Users/jabbott/Development/DAG_Website/etc/uwsgi.conf --stop /Users/jabbott/miniconda3/envs/web/var/run/uwsgi.pid &
+${CONDA_PREFIX}/bin/nginx -s stop &
+${CONDA_PREFIX}/bin/uwsgi --ini ${RNAIT_ROOT}/etc/uwsgi.conf --stop ${CONDA_PREFIX}/var/run/uwsgi.pid &
 

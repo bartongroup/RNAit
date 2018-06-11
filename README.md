@@ -35,7 +35,7 @@ We need to install nginx,uwsgi,nodejs,biopython,primer3,primer3-py and blast
 from conda, and symlink the nginx config in place...
 
 ```bash
-conda install nginx uwsgi nodejs biopython primer3 primer3-py blast
+conda install nginx uwsgi nodejs biopython primer3 primer3-py blast pyyaml
 mv $CONDA_PREFIX/etc/nginx/sites.d/default-site.conf $CONDA_PREFIX/etc/nginx/sites.d/default-site.conf.hiding
 ln -s ${RNAIT_ROOT}/etc/nginx-site.conf $CONDA_PREFIX/etc/nginx/sites.d/
 ```
