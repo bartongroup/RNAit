@@ -22,7 +22,6 @@ cgitb.enable(format='text')
 
 def application(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html')])
-    pp = pprint.PrettyPrinter(indent=4)
 
     config_file = (
         os.path.dirname(
@@ -77,7 +76,6 @@ def application(environ, start_response):
 
 def get_params(environ):
 
-    pp = pprint.PrettyPrinter()
     post_env = environ.copy()
     post_env['QUERY_STRING'] = ''
     post = cgi.FieldStorage(
@@ -261,7 +259,6 @@ def blast_product(product, tmp_dir, db):
     try:
         stdout, stderr = cline()
     except ApplicationError as err:
-        print("returning error: " + err.stderr)
         return('', err.stderr)
 
     result_handle = open(outFileName)
