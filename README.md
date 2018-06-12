@@ -71,12 +71,7 @@ database name and is the value passed through the 'database' form parameter.
 
 Details on the databases are as follows:
 
-Species | Short name | Assembly | Source
+Species | Short name | Source file | Source
 ---|---|---|---
-Leishmania major | lmajor | ASM272v2 | Ensembl Genomes release 39 
-Trypanosoma brucei | tbrucei | TryBru_Apr2005_chr11 | Ensembl Genomes release 39 
+Trypanosoma brucei TREU927 | tbrucei | TriTrypDB-37_TbruceiTREU927_AnnotatedCDSs.fasta | TryTrypDB Release 39
 
-Fasta format CDS files should be uncompressed, symlinked or renamed to their short name and indexed using:
-```bash
-makeblastdb -dbtype nucl -title [shortname] -in [shortname]
-```
