@@ -269,47 +269,71 @@ def blast_product(product, tmp_dir, db):
     alignment_status = ''
     self_alignments = []
     conflicting_alignments = []
+    reasons = []
 
     for alignment in blast_record.alignments:
-        min_ident = 1.00
-        status_set = 0
-        conflicting = 0
+
         alignment_data = {
             'accession': alignment.hit_id,
             'description': alignment.hit_def,
             'subj_length': alignment.length,
         }
+        conflicting = 0
+        hsp_count = 0
+        hsp_idents = []
+        hsp_match_lengths = []
+
+        # Original RNAit implementation reports single value for identity, which
+        # is tricky without tiling HSPs We'll use some slightly different critera
+        # here
+
+        # >1 hsp suggests the alignment is to a repetitive sequence which is
+        # unlikely to amplify cleanly so mark these as bad
+
         for hsp in alignment.hsps:
+            hsp_count += 1
             # check for matches of >20bp identity by checking for stretches of
             # >20 '|' characters in the HSP midline
             match = midline_regex.search(hsp.match)
             match_len = match.end() - match.start()
-            ident = hsp.identities / hsp.align_length
-            if (ident > 0.99):
-                alignment_status = 'Same'
-                status_set = 1
+            ident = (hsp.identities / hsp.align_length)
+            hsp_idents.append(ident)
+            hsp_match_lengths.append(match_len)
+
+        if (hsp_count == 1):
+            if (hsp_idents[0] > 0.99):
+                alignment_status = 'Self alignment'
                 self_alignments.append(alignment_data)
+            elif (hsp_idents[0] > 0.89 and hsp_idents[0] < 0.99):
+                alignment_status = 'Conflicting hits'
+                conflicting_alignments.append(alignment_data)
+                reasons.append("Identity is %s" % (hsp_idents[0]))
+                conflicting += 1
+            elif (hsp_match_lengths[0] > 20):
+                alignment_status = 'Conflicting hits'
+                reasons.append(
+                    "%s bp identical sequence" %
+                    (hsp_match_lengths[0]))
+                conflicting += 1
+            else:
+                alignment_status = 'Good'
+        else:
+            alignment_status = 'Multiple HPSs'
 
-            if (min_ident > ident and (ident > 0.89 and ident < 0.99)):
-                min_ident = ident
-
-        if ((min_ident > 0.89 or match_len > 20) and status_set == 0):
-            alignment_status = "Conflicting: Identity=%.2f %%; Identical stretch=%d bp" % (
-                min_ident * 100, match_len)
-            conflicting = 1
-            conflicting_alignments.append(alignment_data)
-        elif (status_set == 0):
-            aligment_status = 'Good'
+        hsp_idents = list(map(format_ident, hsp_idents))
+        alignment_data['status'] = alignment_status
+        alignment_data['reasons'] = reasons
+        alignment_data['hsps'] = hsp_count
+        alignment_data['ident'] = ";".join(map(str, hsp_idents))
 
     if conflicting:
-        status = 'Bad'
+        primer_status = 'Bad'
     else:
-        status = 'Suitable'
+        primer_status = 'Suitable'
 
     blast_data = {
         'record': blast_record,
-        'alignment_status': alignment_status,
-        'primer_status': status,
+        'primer_status': primer_status,
         'self_alignments': self_alignments,
         'conflicting_alignments': conflicting_alignments,
     }
@@ -354,3 +378,16 @@ def get_error_page(RNAit_dir, error, type):
     html = template.render(error=error, type=type)
     encode = html.encode('UTF-8')
     return(encode)
+
+# format_ident
+#
+# Converts proportion of identities (i.e. 0.93) to a percentage
+#
+# required args: val (str)
+#
+# returns: percent (float)
+
+
+def format_ident(val):
+    percent = ("%.2f" % (float(val) * 100))
+    return(percent)
