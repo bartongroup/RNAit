@@ -281,7 +281,10 @@ def blast_product(product, tmp_dir, db):
         conflicting = 0
         hsp_count = 0
         hsp_idents = []
+        # lengths of consecutive bases...
         hsp_match_lengths = []
+        hsp_alignments = []
+        hsp_hit_lengths = []
 
         # Original RNAit implementation reports single value for identity, which
         # is tricky without tiling HSPs We'll use some slightly different critera
@@ -299,6 +302,11 @@ def blast_product(product, tmp_dir, db):
             ident = (hsp.identities / hsp.align_length)
             hsp_idents.append(ident)
             hsp_match_lengths.append(match_len)
+            hsp_hit_lengths.append(hsp.align_length)
+
+            # pretty format alignment
+            text_alignment = format_alignment(hsp)
+            hsp_alignments.append(text_alignment)
 
         if (hsp_count == 1):
             if (hsp_idents[0] > 0.99):
@@ -325,6 +333,8 @@ def blast_product(product, tmp_dir, db):
         alignment_data['reasons'] = reasons
         alignment_data['hsps'] = hsp_count
         alignment_data['ident'] = ";".join(map(str, hsp_idents))
+        alignment_data['hsp_alignments'] = hsp_alignments
+        alignment_data['hsp_hit_lengths'] = ";".join(map(str, hsp_hit_lengths))
 
     if conflicting:
         primer_status = 'Bad'
@@ -391,3 +401,42 @@ def get_error_page(RNAit_dir, error, type):
 def format_ident(val):
     percent = ("%.2f" % (float(val) * 100))
     return(percent)
+
+# format_alignment
+#
+# Produces a text alignment from hsp with HTML linkbreaks/spaces
+# for rendering in a <pre>
+#
+# requred args: hsp - Bio.Blast.Record.HSP
+#
+# returns: alignment - string
+
+
+def format_alignment(hsp):
+    query_start = hsp.query_start
+    sbjct_start = hsp.sbjct_start
+    offset = 0
+    alignment_lines = []
+
+    line = "Score: %.2f; bits: %.2f; e-value: %.2f\n" % (
+        hsp.score, hsp.bits, hsp.expect)
+    alignment_lines.append(line)
+    alignment_lines.append("\n")
+
+    for i in range(0, hsp.align_length, 75):
+
+        qline = ("Query: %s %s" %
+                 (str(query_start + offset).rjust(4), hsp.query[i:i + 75]))
+        midline = ("            %s" % (hsp.match[i:i + 75]))
+        hline = ("Sbjct: %s %s" %
+                 (str(sbjct_start + offset).rjust(4), hsp.sbjct[i:i + 75]))
+
+        alignment_lines.append(qline)
+        alignment_lines.append(midline)
+        alignment_lines.append(hline)
+        alignment_lines.append('')
+        offset += 75
+
+    alignment = "</br>".join(alignment_lines)
+    alignment = alignment.replace(' ', '&nbsp;')
+    return(alignment)

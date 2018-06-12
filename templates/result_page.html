@@ -79,26 +79,41 @@
               <div class='row'>
                 <div class='col-md-12'>
                   <table class='table'>
-                    <tr><td colspan='5'><h5>Blast hits: >99% Identity</h5></td></tr>
-                    <tr><th>&nbsp;</th><th>Description</th><th>Length</th><th>Num HSPs</th><th>Identity (%)</th></tr>
+                    <tr><td colspan='7'><h5>Blast hits: >99% Identity</h5></td></tr>
+                    <tr><th>&nbsp;</th><th>Description</th><th>Subject<br/>Length</th><th>Alignment<br/>Length</th><th>Num HSPs</th><th>Identity (%)</th><th>View</th></tr>
                     {% for hit in blast[loop.index-1].self_alignments %}
                     <tr>
-                      <td data-toggle='tooltop' title='{{ hit.status }}' data-placement='top'><i class='fas {% if hit.status=='Self alignment' %}fa-thumbs-up{% else %}fa-thumbs-down{% endif %}'></i></td>
+                      <td data-toggle='tooltip' title='{{ hit.status }}' data-placement='top'>
+                        <i class='fas {% if hit.status=='Self alignment' %}fa-thumbs-up{% else %}fa-thumbs-down{% endif %}'/>
+                      </td>
                       <td>{{ hit.description }}</td>
                       <td>{{ hit.subj_length }}</td>
+                      <td>{{ hit.hsp_hit_lengths }}</td>
                       <td>{{ hit.hsps }}</td>
                       <td>{{ hit.ident }}</td>
+                      <td data-toggle='tooltip' title='View alignment' data-placement='top'>
+                        <i class='fas fa-eye' onclick='al=document.getElementById("self_hit_{{ loop.index }}").style; if (al.display=="none") {al.display="block";this.className="fas fa-eye-slash"} else {al.display="none";this.className="fas fa-eye";}'/>
+                      </td>
                     </tr>
+                    <tr><td colspan='7'><div id='self_hit_{{ loop.index }}' style='font-family:monospace;line-height: 1.2;display:none'>{% for alignment in hit.hsp_alignments %}{{ alignment|safe }}{% endfor %}</div></td></tr></td>
                     {% endfor %}
-                    <tr><td colspan='5'><h5>Blast hits: >80-99% Identity</h5></td></tr>
-                    <tr><th>&nbsp;</th><th>Description</th><th>Length</th><th>Num HSPs</th><th>Identity (%)</th></tr>
+                    <tr><td colspan='7'><h5>Blast hits: >80-99% Identity</h5></td></tr>
+                    <tr><th>&nbsp;</th><th>Description</th><th>Subject<br/>Length</th><th>Alignment<br/>Length</th><th>Num HSPs</th><th>Identity (%)</th><th>View</th></tr>
                     {% for hit in blast[loop.index-1].conflicting_alignments %}
-                      <td data-toggle='tooltop' title='{{ hit.status }}' data-placement='top'><i class='fas {% if hit.status=='Self alignment' %}fa-thumbs-up{% else %}fa-thumbs-down{% endif %}'></i></td>
+                      <td data-toggle='tooltop' title='{{ hit.status }}' data-placement='top'>
+                        <i class='fas {% if hit.status=='Self alignment' %}fa-thumbs-up{% else %}fa-thumbs-down{% endif %}'/>
+                      </td>
                       <td>{{ hit.description }}</td>
                       <td>{{ hit.subj_length }}</td>
+                      <td>{{ hit.hsp_hit_lengths }}</td>
                       <td>{{ hit.hsps }}</td>
                       <td>{{ hit.ident }}</td>
+                      <td data-toggle='tooltip' title='View alignment' data-placement='top'>
+                        <i class='fas fa-eye' onclick='al=document.getElementById("other_hit_{{ loop.index }}").style; if (al.display=="none") {al.display="block";$(this).removeClass("fa-eye").addClass("fa-eye-slash")} else {al.display="none";$(this).removeClass("fa-eye-slash").addClass("fa-eye");}'/>
+                      </td>
+                    
                     </tr>
+                    <tr><td colspan='7'><div id='other_hit_{{ loop.index }}' style='font-family:monospace;line-height: 1.2;display:none'>{% for alignment in hit.hsp_alignments %}{{ alignment|safe }}{% endfor %}</div></td></tr></td>
                     {% endfor %}
                   </table>              
                 </div> <!-- col-md-12-->
