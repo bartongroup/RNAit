@@ -73,7 +73,6 @@ def application(environ, start_response):
         if (error):
             return(get_error_page(RNAit_dir, error, 'runtime'))
         blast_results.append(blast_result)
-
     html = get_output_page(query_info, primers, RNAit_dir, blast_results)
 
     return [html]
@@ -288,6 +287,11 @@ def blast_product(product, tmp_dir, db, string_min,
     matching_alignments = []
     reasons = []
 
+    # flag for tracking conflicting hits identified
+    conflicting = 0
+    # flag for tracking hits with match exceeding subunit length
+    matching = 0
+
     for alignment in blast_record.alignments:
 
         alignment_data = {
@@ -295,10 +299,6 @@ def blast_product(product, tmp_dir, db, string_min,
             'description': alignment.hit_def,
             'subj_length': alignment.length,
         }
-        # flag for tracking conflicting hits identified
-        conflicting = 0
-        # flag for tracking hits with match exceeding subunit length
-        matching = 0
         hsp_count = 0
         hsp_idents = []
         # lengths of consecutive bases...
@@ -336,15 +336,15 @@ def blast_product(product, tmp_dir, db, string_min,
             elif (hsp_idents[0] > string_min and hsp_idents[0] < string_max):
                 alignment_status = 'Conflicting hits'
                 conflicting_alignments.append(alignment_data)
-                reasons.append("Identity is %s" % (hsp_idents[0]))
                 conflicting += 1
+                reasons.append("Identity is %s" % (hsp_idents[0]))
             elif (hsp_match_lengths[0] > subunit_length):
                 alignment_status = 'Match exceeding subunit length'
                 matching_alignments.append(alignment_data)
+                matching += 1
                 reasons.append(
                     "%s bp identical sequence" %
                     (hsp_match_lengths[0]))
-                matching += 1
             else:
                 alignment_status = 'Good'
         else:
