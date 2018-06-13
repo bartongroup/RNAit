@@ -154,8 +154,8 @@
                               </td>
                             </tr>
                            {% endfor %}
-                            <tr><td colspan='7'><h5>Blast hits: >80-99% Identity</h5></td></tr>
-                            <tr><th>&nbsp;</th><th>Description</th><th>Subject<br/>Length</th><th>Alignment<br/>Length</th><th>Num HSPs</th><th>Identity (%)</th><th>View</th></tr>
+                            <tr><td colspan='7'><h5>Blast hits: {{ query_info.stringency }}% Identity</h5></td></tr>
+                            <tr><th>Impact</th><th>Description</th><th>Subject<br/>Length</th><th>Alignment<br/>Length</th><th>Num HSPs</th><th>Identity (%)</th><th>View</th></tr>
                             {% for hit in blast[loop.index-1].conflicting_alignments %}
                             <tr>
                               <td data-toggle='tooltop' title='{{ hit.status }}' data-placement='top'>
@@ -184,6 +184,36 @@
                               </td>
                             </tr>
                             {% endfor %}
+                            <tr><td colspan='7'><h5>Blast hits with matches exceeding {{ query_info.subunit_length}} bp</h5></td></tr>
+                            <tr><th>Impact</th><th>Description</th><th>Subject<br/>Length</th><th>Alignment<br/>Length</th><th>Num HSPs</th><th>Identity (%)</th><th>View</th></tr>
+                            {% for hit in blast[loop.index-1].matching_alignments %}
+                            <tr>
+                              <td data-toggle='tooltip' title='{{ hit.status }}' data-placement='top'>
+                                <i class='fas {% if hit.status=='Self alignment' %}fa-thumbs-up{% else %}fa-thumbs-down{% endif %}'></i>
+                              </td>
+                              <td>{{ hit.description }}</td>
+                              <td>{{ hit.subj_length }}</td>
+                              <td>{{ hit.hsp_hit_lengths }}</td>
+                              <td>{{ hit.hsps }}</td>
+                              <td>{{ hit.ident }}</td>
+                              <td data-toggle='tooltip' title='Toggle alignment view' data-placement='top'>
+                                <i class='fas fa-eye'
+                                   onclick='al=document.getElementById("primer_{{ primer_index }}_matching_hit_{{ loop.index }}").style;
+                                   if (al.display=="none") {
+                                      al.display="block";
+                                      $(this).removeClass("fa-eye").addClass("fa-eye-slash")
+                                    } else {
+                                      al.display="none";
+                                      $(this).removeClass("fa-eye-slash").addClass("fa-eye");}' >
+                                </i>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style='border-top:none' colspan='7'>
+                                <div id='primer_{{ primer_index }}_matching_hit_{{ loop.index }}' style='font-family:monospace;line-height: 1.2;display:none'>{% for alignment in hit.hsp_alignments %}{{ alignment|safe }}{% endfor %}</div>
+                              </td>
+                            </tr>
+                           {% endfor %}
                           </table>              
                         </div> <!-- col-md-12-->
                       </div> <!-- row -->

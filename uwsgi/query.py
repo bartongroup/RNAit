@@ -62,9 +62,14 @@ def application(environ, start_response):
         return(encode)
 
     blast_results = []
+    string_min = int(params.get('string_min'))
+    string_max = int(params.get('string_max'))
+    subunit_length = int(params.get('subunit_length'))
+
     for pair in primers:
         product = get_pcr_product(seq, pair)
-        blast_result, error = blast_product(product, tmp_dir, db)
+        blast_result, error = blast_product(
+            product, tmp_dir, db, string_min, string_max, subunit_length)
         if (error):
             return(get_error_page(RNAit_dir, error, 'runtime'))
         blast_results.append(blast_result)
@@ -252,7 +257,8 @@ def get_pcr_product(seq, pair):
 # object), alignment status etc.
 
 
-def blast_product(product, tmp_dir, db):
+def blast_product(product, tmp_dir, db, string_min,
+                  string_max, subunit_length):
     blast_dir = mkdtemp(dir=tmp_dir)
     queryFileName = blast_dir + '/query'
     outFileName = blast_dir + '/output.xml'
@@ -279,6 +285,7 @@ def blast_product(product, tmp_dir, db):
     alignment_status = ''
     self_alignments = []
     conflicting_alignments = []
+    matching_alignments = []
     reasons = []
 
     for alignment in blast_record.alignments:
@@ -288,7 +295,10 @@ def blast_product(product, tmp_dir, db):
             'description': alignment.hit_def,
             'subj_length': alignment.length,
         }
+        # flag for tracking conflicting hits identified
         conflicting = 0
+        # flag for tracking hits with match exceeding subunit length
+        matching = 0
         hsp_count = 0
         hsp_idents = []
         # lengths of consecutive bases...
@@ -323,17 +333,18 @@ def blast_product(product, tmp_dir, db):
             if (hsp_idents[0] > 0.99 and length_cov == 1):
                 alignment_status = 'Self alignment'
                 self_alignments.append(alignment_data)
-            elif (hsp_idents[0] > 0.89 and hsp_idents[0] < 0.99):
+            elif (hsp_idents[0] > string_min and hsp_idents[0] < string_max):
                 alignment_status = 'Conflicting hits'
                 conflicting_alignments.append(alignment_data)
                 reasons.append("Identity is %s" % (hsp_idents[0]))
                 conflicting += 1
-            elif (hsp_match_lengths[0] > 20):
-                alignment_status = 'Conflicting hits'
+            elif (hsp_match_lengths[0] > subunit_length):
+                alignment_status = 'Match exceeding subunit length'
+                matching_alignments.append(alignment_data)
                 reasons.append(
                     "%s bp identical sequence" %
                     (hsp_match_lengths[0]))
-                conflicting += 1
+                matching += 1
             else:
                 alignment_status = 'Good'
         else:
@@ -349,6 +360,8 @@ def blast_product(product, tmp_dir, db):
 
     if conflicting:
         primer_status = 'Bad'
+    elif matching:
+        primer_status = 'Bad'
     else:
         primer_status = 'Suitable'
 
@@ -357,6 +370,7 @@ def blast_product(product, tmp_dir, db):
         'primer_status': primer_status,
         'self_alignments': self_alignments,
         'conflicting_alignments': conflicting_alignments,
+        'matching_alignments': matching_alignments,
     }
     shutil.rmtree(blast_dir)
 
