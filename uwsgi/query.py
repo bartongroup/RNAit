@@ -309,7 +309,8 @@ def blast_product(product, tmp_dir, db):
             hsp_alignments.append(text_alignment)
 
         if (hsp_count == 1):
-            if (hsp_idents[0] > 0.99):
+            length_cov = hsp_match_lengths[0] / blast_record.query_letters
+            if (hsp_idents[0] > 0.99 and length_cov == 1):
                 alignment_status = 'Self alignment'
                 self_alignments.append(alignment_data)
             elif (hsp_idents[0] > 0.89 and hsp_idents[0] < 0.99):
