@@ -1,0 +1,24 @@
+/* Overrides bootstrap styles where necessary...
+ * Mostly reducing sizes and padding to make for a more compact page */
+/*firefox renders some range inputs with a border, although chrome doesn't...*/
+#string_min,#string_max {
+    border: none;
+}
+.form-control {
+    padding: .0rem .75rem;
+}
+h1 {
+    font-size: 2rem;   
+}
+h2 {
+    font-size: 1.5rem;
+}
+.card {
+    margin-bottom: 1rem;
+}
+.card-body {
+    padding: 1em 1.25em 0.5em 1.25em; 
+}
+.bold {
+    font-weight:bold;
+}
