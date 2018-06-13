@@ -438,6 +438,6 @@ def format_alignment(hsp):
         alignment_lines.append('')
         offset += 75
 
-    alignment = "</br>".join(alignment_lines)
+    alignment = "<br/>".join(alignment_lines)
     alignment = alignment.replace(' ', '&nbsp;')
     return(alignment)
