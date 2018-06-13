@@ -16,6 +16,7 @@
         <div class='col-md-12'>
           <h2>Results</h2>
           {% for primer in primers %}
+            {% set primer_index = loop.index%}
           <div class='card'>
             <div class='card-header '>
               <button id='view{{ loop.index }}' class='btn btn-primary float-right' style='{% if loop.index!=1 %}display:inline{% else %}display:none{% endif %}' onclick='document.getElementById("primer{{ loop.index}}").style.display="block";document.getElementById("view{{ loop.index }}").style.display="none";document.getElementById("hide{{ loop.index }}").style.display="inline";'>View</button>
@@ -92,10 +93,10 @@
                       <td>{{ hit.hsps }}</td>
                       <td>{{ hit.ident }}</td>
                       <td data-toggle='tooltip' title='View alignment' data-placement='top'>
-                        <i class='fas fa-eye' onclick='al=document.getElementById("self_hit_{{ loop.index }}").style; if (al.display=="none") {al.display="block";this.className="fas fa-eye-slash"} else {al.display="none";this.className="fas fa-eye";}'/>
+                        <i class='fas fa-eye' onclick='al=document.getElementById("primer_{{ primer_index }}_self_hit_{{ loop.index }}").style; if (al.display=="none") {al.display="block";this.className="fas fa-eye-slash"} else {al.display="none";this.className="fas fa-eye";}'/>
                       </td>
                     </tr>
-                    <tr><td colspan='7'><div id='self_hit_{{ loop.index }}' style='font-family:monospace;line-height: 1.2;display:none'>{% for alignment in hit.hsp_alignments %}{{ alignment|safe }}{% endfor %}</div></td></tr></td>
+                    <tr><td colspan='7'><div id='primer_{{ primer_index }}_self_hit_{{ loop.index }}' style='font-family:monospace;line-height: 1.2;display:none'>{% for alignment in hit.hsp_alignments %}{{ alignment|safe }}{% endfor %}</div></td></tr></td>
                     {% endfor %}
                     <tr><td colspan='7'><h5>Blast hits: >80-99% Identity</h5></td></tr>
                     <tr><th>&nbsp;</th><th>Description</th><th>Subject<br/>Length</th><th>Alignment<br/>Length</th><th>Num HSPs</th><th>Identity (%)</th><th>View</th></tr>
@@ -109,11 +110,11 @@
                       <td>{{ hit.hsps }}</td>
                       <td>{{ hit.ident }}</td>
                       <td data-toggle='tooltip' title='View alignment' data-placement='top'>
-                        <i class='fas fa-eye' onclick='al=document.getElementById("other_hit_{{ loop.index }}").style; if (al.display=="none") {al.display="block";$(this).removeClass("fa-eye").addClass("fa-eye-slash")} else {al.display="none";$(this).removeClass("fa-eye-slash").addClass("fa-eye");}'/>
+                        <i class='fas fa-eye' onclick='al=document.getElementById("primer_{{ primer_index }}_other_hit_{{ loop.index }}").style; if (al.display=="none") {al.display="block";$(this).removeClass("fa-eye").addClass("fa-eye-slash")} else {al.display="none";$(this).removeClass("fa-eye-slash").addClass("fa-eye");}'/>
                       </td>
                     
                     </tr>
-                    <tr><td colspan='7'><div id='other_hit_{{ loop.index }}' style='font-family:monospace;line-height: 1.2;display:none'>{% for alignment in hit.hsp_alignments %}{{ alignment|safe }}{% endfor %}</div></td></tr></td>
+                    <tr><td colspan='7'><div id='primer_{{ primer_index }}_other_hit_{{ loop.index }}' style='font-family:monospace;line-height: 1.2;display:none'>{% for alignment in hit.hsp_alignments %}{{ alignment|safe }}{% endfor %}</div></td></tr></td>
                     {% endfor %}
                   </table>              
                 </div> <!-- col-md-12-->
