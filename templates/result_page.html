@@ -132,6 +132,7 @@
                       <div class='row'>
                         <div class='col-md-12'>
                           <table class='table'>
+                            {% if blast[loop.index-1].self_alignments %}
                             <tr><td colspan='7'><h5>Blast hits: >99% Identity</h5></td></tr>
                             <tr><th>Impact</th><th>Description</th><th>Subject<br/>Length</th><th>Alignment<br/>Length</th><th>Num HSPs</th><th>Identity (%)</th><th>View</th></tr>
                             {% for hit in blast[loop.index-1].self_alignments %}
@@ -162,6 +163,8 @@
                               </td>
                             </tr>
                            {% endfor %}
+                           {% endif %}
+                           {% if blast[loop.index-1].conflicting_alignments %}
                             <tr><td colspan='7'><h5>Blast hits: {{ query_info.stringency }}% Identity</h5></td></tr>
                             <tr><th>Impact</th><th>Description</th><th>Subject<br/>Length</th><th>Alignment<br/>Length</th><th>Num HSPs</th><th>Identity (%)</th><th>View</th></tr>
                             {% for hit in blast[loop.index-1].conflicting_alignments %}
@@ -191,7 +194,9 @@
                                 <div id='primer_{{ primer_index }}_other_hit_{{ loop.index }}' style='font-family:monospace;line-height: 1.2;display:none'>{% for alignment in hit.hsp_alignments %}{{ alignment|safe }}{% endfor %}</div>
                               </td>
                             </tr>
-                            {% endfor %}
+                          {% endfor %}
+                        {% endif %}
+                        {% if blast[loop.index-1].matching_alignments %}
                             <tr><td colspan='7'><h5>Blast hits with matches exceeding {{ query_info.subunit_length}} bp</h5></td></tr>
                             <tr><th>Impact</th><th>Description</th><th>Subject<br/>Length</th><th>Alignment<br/>Length</th><th>Num HSPs</th><th>Identity (%)</th><th>View</th></tr>
                             {% for hit in blast[loop.index-1].matching_alignments %}
@@ -222,6 +227,7 @@
                               </td>
                             </tr>
                            {% endfor %}
+                         {% endif %}
                           </table>              
                         </div> <!-- col-md-12-->
                       </div> <!-- row -->
