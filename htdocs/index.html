@@ -23,7 +23,7 @@
       </div><!--row-->
       <div class='row'>
         <div class='col-md-12'>
-        <p><span style='font-weight: bold'>Citation: </span>Redmond <span style='font-style:oblique'>et al.</span> 2003, Mol. Biochem. Parasitol. 128:115-118. <a href=http://doi.org/doi:10.1016/S0166-6851(03)00045-8>doi:10.1016/S0166-6851(03)00045-8</a></p>
+         <p/>
           <form id='RNAit' method='POST' enctype='multipart/form-data' class='needs-validation' action='/RNAit/query.py' onreset='set_default_vals();' novalidate>
             <div class='card'>
               <h2 class='card-header'>
@@ -72,16 +72,16 @@
                     <div class='form-group row'>
                       <div class='col-md-3 col-form-label'>PCR product size</div>
                       <div class='col-md-4'>
-                        <small id='product_min_info'>Minimum product size (bp)</small>
+                        <small id='product_min_info'>Minimum size (bp)</small>
                         <input type='text' id='product_min' name='product_min' aria-describedby='product_min_info' class='form-control col' value='400'/>
                       </div><!--col-md-4-->
                       <div class='col-md-4'>
-                        <small id='product_max_info'>Maximum product size (bp)</small>
+                        <small id='product_max_info'>Maximum size (bp)</small>
                         <input type='text' id='product_max' name='product_max' aria-describedby='product_max_info' class='form-control col' value='600'/>
                       </div><!--col-md-4-->
                     </div><!--form-group row-->
                     <div class='row'> <!-- dummy row to match height of blast parameters card -->
-                     <p>&nbsp;</p>
+                    <p style='line-height:0.8'>&nbsp;</p>
                     </div> <!-- row -->
                   </div><!--card-body-->
                 </div><!--card-->
@@ -96,12 +96,12 @@
                     <div class='form-group row'>
                       <div class='col-md-3 col-form-label'>Stringency</div>
                         <div class='col-md-4'>
-                          <small id='string_min_info'>Minimum blast similarity (%)</small>
-                          <input type='range' id='string_min' name='string_min' aria-describedby='string_min_info' class='form-control col' min='80' max='99' value='80' oninput=';string_min_out.value=string_min.value + "%"'/>
-                          <output id='string_min_out'>80%</output>
+                          <small id='string_min_info'>Minimum similarity</small>
+                          <input type='range' id='string_min' name='string_min' aria-describedby='string_min_info' class='form-control col' min='80' max='99' value='89' oninput=';string_min_out.value=string_min.value + "%"'/>
+                          <output id='string_min_out'>89%</output>
                         </div>
                         <div class='col-md-4'>
-                          <small id='string_max_info'>Maximum blast similarity (%)</small>
+                          <small id='string_max_info'>Maximum similarity</small>
                           <input type='range' id='string_max' name='string_max' aria-describedby='string_max_info' class='form-control col' min='80' max='99' value='99'  oninput='string_max_out.value=string_max.value + "%";'/>
                           <output id='string_max_out'>99%</output>
                         </div>
@@ -140,12 +140,6 @@
                 </div><!--card-->
               </div> <!--col-md-6-->
             
-              <p>&nbsp;</p>
-              <div class='form-group'>
-                <div class='col-md-9 col-md-offset-3'>
-                  <div id='messages'></div>
-                </div>
-              </div>
             </div> <!--row-->
             <div class='form-group row'>
               <div class='col-md-12'>
@@ -153,6 +147,34 @@
                 <button type='reset' class='btn btn-secondary'>Reset</button>
               </div>
             </div><!--row-->
+            
+            <div class='card'>
+             <h2 class='card-header'>About RNAit</h2>
+             <div class='card-body'>
+              <p>RNAit is a tool to facilitate the accurate design of RNAi
+              constructs for typanosomes. Primer3 is used to identify potential
+              primer pairs for creation of RNAi constructs, and the resulting
+              products of these primer pairs are then screened against a blast
+              databases of CDS sequences from the target organism to identify
+              potentially conflicting sequences. Sequences which have >89%
+              identity, or stretches of >20bp of identical bases have been
+              identified as likely candidates for co-suppression. 
+              </p>
+              <p>
+                Blast hits are placed in three categories as follows:
+              </p>
+              <table class='table'>
+               <tr><th>Self match</th><td>Sequence identity > 99%; Alignment length > 95% length of query sequence</td></tr>
+               <tr><th>Conflicting</th><td>Sequence identity between specified minimim and maximum values</td></tr>
+               <tr><th>Exceeding subunit length</th><td>Hits with exact matches longer than the defined subunit length</td></tr>
+              </table>
+              <p>Primer pairs which do not have any hits classified as 'Conficting'
+              or 'Exceeding subunit length' are considered good candidates.</p>
+              <p>RNAit was developed by <a href='http://fieldlab.org'>The Field Lab</a>. This is a reimplementation of the original system by <a href='http://www.compbio.dundee.ac.uk/dag.html'>The Data Analysis Group</a></p>
+              <p><span style='font-weight: bold'>Citation: </span>Redmond <span style='font-style:oblique'>et al.</span> 2003, Mol. Biochem. Parasitol. 128:115-118. <a href=http://doi.org/doi:10.1016/S0166-6851(03)00045-8>doi:10.1016/S0166-6851(03)00045-8</a></p>
+             </div>
+            
+            
           </form>
         </div>
       </div>
