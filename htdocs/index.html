@@ -13,10 +13,16 @@
   </head>
   <body onload='set_default_vals()'>
     <div class='container'>
+      <div class='row header'>
+       <div class='col-md-6 '>
+         <img src='/images/logo-white_50.png' alt='University of Dundee logo'/>
+       </div><!--col-md-10-->
+       <div class='col-md-6'>
+         <h1>RNAit: RNAi target selection for Trypanosome genomes</h1>
+       </div>
+      </div><!--row-->
       <div class='row'>
-        
         <div class='col-md-12'>
-        <h1>RNAit: RNAi target selection for Trypanosome genomes</h1>
         <p><span style='font-weight: bold'>Citation: </span>Redmond <span style='font-style:oblique'>et al.</span> 2003, Mol. Biochem. Parasitol. 128:115-118. <a href=http://doi.org/doi:10.1016/S0166-6851(03)00045-8>doi:10.1016/S0166-6851(03)00045-8</a></p>
           <form id='RNAit' method='POST' enctype='multipart/form-data' class='needs-validation' action='/RNAit/query.py' onreset='set_default_vals();' novalidate>
             <div class='card'>
@@ -25,11 +31,11 @@
               </h2>
               <div class='card-body'>
                 <div class='form-group row'>
-                  <label class='col-md-3 col-form-label' for='seqpaste'>Paste DNA sequence<br/>(raw/fasta formats)</label>
+                  <label class='col-md-3 col-form-label' for='seqpaste'>Paste DNA sequence<br/>(fasta format)</label>
                   <div class='col-md-9'>
                     <div class='row'>
                       <textarea id='seqpaste' name='seqpaste' class='form-control' aria-describedby='seqpaste_info'></textarea>
-                      <small id='seqpaste_info'>This field accepts raw or fasta formatted DNA sequences for the region to be targeted</small>
+                      <small id='seqpaste_info'>This field accepts fasta formatted DNA sequences for the region to be targeted</small>
                     </div>
                   </div> 
                 </div>
@@ -74,6 +80,9 @@
                         <input type='text' id='product_max' name='product_max' aria-describedby='product_max_info' class='form-control col' value='600'/>
                       </div><!--col-md-4-->
                     </div><!--form-group row-->
+                    <div class='row'> <!-- dummy row to match height of blast parameters card -->
+                     <p>&nbsp;</p>
+                    </div> <!-- row -->
                   </div><!--card-body-->
                 </div><!--card-->
               </div><!--col-md-6-->

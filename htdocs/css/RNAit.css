@@ -1,6 +1,7 @@
 /* Overrides bootstrap styles where necessary...
  * Mostly reducing sizes and padding to make for a more compact page */
-/*firefox renders some range inputs with a border, although chrome doesn't...*/
+
+/* firefox renders some range inputs with a border, although chrome doesn't... */
 #string_min,#string_max {
     border: none;
 }
@@ -8,7 +9,14 @@
     padding: .0rem .75rem;
 }
 h1 {
-    font-size: 2rem;   
+    font-family:Baxter Sans Medium,Helvetica,Arial,sans-serif;
+    font-weight:300;
+    font-size:1.25rem;
+    color: #fff;
+    float:right;
+    display:inline-block;
+    line-height:50px;
+    vertical-align:middle;
 }
 h2 {
     font-size: 1.5rem;
@@ -22,3 +30,22 @@ h2 {
 .bold {
     font-weight:bold;
 }
+.header {
+    background-color:#4365e2;
+    padding:1.25em;
+    vertical-align: middle;
+}
+.btn-primary {
+    background-color:#4365e2 !important;
+}
+.alert-danger {
+    background-color:#f4cec3 !important;
+}
+.alert-success {
+    background-color:#c4ebd0 !important;
+}
+/*.card-header {
+   background-color:#d1e2f2 !important; /*blue*/
+   /* background-color:#ddd9d6 !important;*/ /*gray*/
+   
+}*/
