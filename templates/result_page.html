@@ -25,7 +25,12 @@
       <div class='row'>
         <div class='col-md-12'>
           <div class='card'>
-            <h2 class='card-header'>Query Details</h2>
+            <div class='card-header'>
+              <button id='new_query' class='btn btn-primary nav-button' onclick="window.location.href='/';">New Query</button>
+              <button id='back' class='btn btn-primary nav-button' onclick='window.history.back();'>Back</button>
+              <h2 class='card-title left'>Query Details</h2>
+            </div>
+            
             <div class='card-body'>
               <table class='table'>
                 <tr>
@@ -53,7 +58,7 @@
             <div class='card-header '>
               <button id='view{{ loop.index }}' class='btn btn-primary float-right' style='{% if loop.index!=1 %}display:inline{% else %}display:none{% endif %}' onclick='document.getElementById("primer{{ loop.index}}").style.display="block";document.getElementById("view{{ loop.index }}").style.display="none";document.getElementById("hide{{ loop.index }}").style.display="inline";'>View</button>
               <button id='hide{{ loop.index }}' class='btn btn-primary float-right' style='{% if loop.index==1 %}display:inline{% else %}display:none{% endif %}' onclick='document.getElementById("primer{{ loop.index}}").style.display="none";document.getElementById("hide{{ loop.index }}").style.display="none";document.getElementById("view{{ loop.index }}").style.display="inline";'>Hide</button>
-              <h3 class='card-title left'>Primer pair {{ loop.index }}</h3>
+              <h2 class='card-title left'>Primer pair {{ loop.index }}</h2>
               <div class="alert {% if blast[loop.index-1].primer_status=='Suitable' %}alert-success{% else %}alert-danger{% endif %}">Primer status: {{ blast[loop.index-1].primer_status }}</div>
             </div>
             <div class='card-body' style='{% if loop.index==1 %}display:block{% else %}display:none{% endif %}' id='primer{{ loop.index }}'>

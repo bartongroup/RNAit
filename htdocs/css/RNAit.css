@@ -20,6 +20,9 @@ h1 {
 }
 h2 {
     font-size: 1.5rem;
+    line-height:40px;
+    display:inline-block;
+    vertical-align:middle;
 }
 .card {
     margin-bottom: 1rem;
@@ -34,6 +37,11 @@ h2 {
     background-color:#4365e2;
     padding:1.25em;
     vertical-align: middle;
+}
+.nav-button {
+    display:inline !important;
+    margin:5px !important;
+    float: right;
 }
 .btn-primary {
     background-color:#4365e2 !important;
