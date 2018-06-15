@@ -97,8 +97,31 @@ def get_params(environ):
         environ=post_env,
         keep_blank_values=True)
 
+    # For parameter validation...
+    param_checks = {
+        'melting_temp': 'int:50-75',
+        'product_min': 'int',
+        'product_max': 'int',
+        'string_min': 'int:>80',
+        'string_max': 'int:<99',
+        'subunit_length': 'int:15-25',
+        'database': 'string:"tbrucei|lmajor"',
+    }
+
+    # for user-friendly output messages....
+    param_names = {
+        'melting_temp': 'melting temperature',
+        'product_min': 'minimum PCR product size',
+        'product_max': 'maximum PCR product size',
+        'string_min': 'minimum similarity',
+        'string_max': 'maximum similarity',
+        'subunit_length': 'subunit length',
+        'database': 'database',
+    }
+
     params = {}
     for f in post.list:
+        # sequence fields need SeqIO.records creating
         if f.name == 'seqpaste' and f.value != '':
             seqH = io.StringIO(f.value)
             try:
@@ -114,10 +137,63 @@ def get_params(environ):
                 params['seq'] = record
             except ValueError:
                 params['error'] = 'the uploaded sequence does not appear to be valid fasta format'
-        else:
+        else:  # other parameters need validating against criteria defined in param_checks
+            param_type = param_checks.get(f.name)
+            if param_type:
+                param_types = param_type.split(':')
+                criteria = ''
+                if len(param_types) > 1:
+                    criteria = param_types[1]
+                if param_types[0] == 'int':
+                    error = check_int(f.name, f.value, criteria, param_names)
+                    if error:
+                        params['error'] = error
+                elif param_types[0] == 'string':
+                    if not f.value in criteria:
+                        params['error'] = 'Invalid value (%s) provided for %s parameter: Valid options are %s' % (
+                            f.value, param_names.get(f.name), param_types[1])
+                        return(params)
+
             params[f.name] = f.value
 
     return(params)
+
+# check_int
+#
+# checks provided integer parameter against specified critera
+#
+# required args: name - string
+#                value - integer
+#                criteria - string defining valid values (<x,>x,x-y)
+#                param_names - dictionary of parameter name -> human readable names
+#
+# returns: string (empty on success, error on failure)
+
+
+def check_int(name, value, criteria, param_names):
+
+    error = 'Invalid value (%s) provided for %s parameter: Outside range %s' % (
+        value, param_names.get(name), criteria)
+    try:
+        value = int(value)
+    except ValueError:
+        error = 'Invalid value (%s) provided for %s parameter: Value should be an integer' % (
+            value, param_names.get(name))
+        return(error)
+    if '-' in criteria:
+        min, max = criteria.split("-")
+        if (value < int(min)) or(value > int(max)):
+            return(error)
+    elif '<' in criteria:
+        thresh = int(criteria.replace('<', ''))
+        if value > thresh:
+            return(error)
+    elif '>' in criteria:
+        thresh = int(criteria.replace('>', ''))
+        if value < thresh:
+            return(error)
+
+    return('')
 
 # get_primer_pairs
 #

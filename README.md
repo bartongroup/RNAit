@@ -69,6 +69,10 @@ Blast databases are obtained where possible from CDS sequences from
 ensembl distributions. Each database has a 'short name' which is the blast
 database name and is the value passed through the 'database' form parameter.
 
+When adding a database, it also needs to be added to the 'database' input field
+of htdocs/index.html, and it's short name to the params_check.database which is
+used for server-side paramater validation. 
+
 Details on the databases are as follows:
 
 Species | Short name | Source file | Source
