@@ -333,7 +333,7 @@ def blast_product(product, tmp_dir, db, string_min,
             if (hsp_idents[0] > 0.99 and length_cov == 1):
                 alignment_status = 'Self alignment'
                 self_alignments.append(alignment_data)
-            elif (hsp_idents[0] > string_min and hsp_idents[0] < string_max):
+            elif (hsp_idents[0] * 100 > string_min and hsp_idents[0] * 100 < string_max):
                 alignment_status = 'Conflicting hits'
                 conflicting_alignments.append(alignment_data)
                 conflicting += 1
