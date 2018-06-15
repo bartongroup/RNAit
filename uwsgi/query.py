@@ -155,6 +155,8 @@ def get_params(environ):
                         return(params)
 
             params[f.name] = f.value
+    if bool(params) == False:
+        params['error'] = 'No valid input parameters provided'
 
     return(params)
 
