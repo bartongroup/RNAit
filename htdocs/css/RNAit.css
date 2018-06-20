@@ -44,7 +44,10 @@ h2 {
     float: right;
 }
 .btn-primary {
-    background-color:#4365e2 !important;
+    background-color:#3c61cf !important;
+}
+.btn-primary:hover {
+    background-color:#303680 !important;
 }
 .alert-danger {
     background-color:#f4cec3 !important;
@@ -57,7 +60,6 @@ h2 {
     color:#ffffff !important;
     font-weight: 200 !important;
 }
-
 .help {
     float:right;
     vertical-align:middle;
