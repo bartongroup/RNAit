@@ -105,7 +105,7 @@ def get_params(environ):
         'string_min': 'int:>80',
         'string_max': 'int:<99',
         'subunit_length': 'int:15-25',
-        'database': 'string:"tbrucei|lmajor"',
+        'database': 'string:"TbruceiTREU927|TbruceiGambienseDAL972|TbruceiLister427|TcongolenseIL3000"',
     }
 
     # for user-friendly output messages....

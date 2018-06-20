@@ -77,5 +77,9 @@ Details on the databases are as follows:
 
 Species | Short name | Source file | Source
 ---|---|---|---
-Trypanosoma brucei TREU927 | tbrucei | TriTrypDB-37_TbruceiTREU927_AnnotatedCDSs.fasta | TryTrypDB Release 39
+Trypanosoma brucei TREU927 | TbruceiTREU927 | TriTrypDB-37_TbruceiTREU927_AnnotatedCDSs.fasta | TryTrypDB Release 39
+Trypanosoma brucei lister 427 | TbruceiLister427 | TriTrypDB-37_TbruceiLister427_AnnotatedCDSs.fasta | TryTrypDB Release 39
+Trypanosoma brucei gambiense DAL972 | TbruceiGambienseDAL972 | TriTrypDB-37_TbruceigambienseDAL972_AnnotatedCDSs.fasta | TryTrypDB Release 39
+Trypanosoma congolense IL3000 | TcongolenseIL3000 | TriTrypDB-37_TcongolenseIL3000_AnnotatedCDSs.fasta | TryTrypDB Release 39
+
 
