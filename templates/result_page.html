@@ -10,15 +10,22 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
     <script src="/js/fontawesome-all.min.js"></script>
+    <script>
+      function toggle(x) {
+        div=document.getElementById(x);
+        if (div.style.display=='none'){div.style.display='block'} else {div.style.display='none'}
+      }
+    </script>
   </head>
   <body>
     <div class='container'>
       <div class='row header'>
        <div class='col-md-6 '>
-         <a href='http://www.dundee.ac.uk'><img src='/images/logo-white_50.png' alt='University of Dundee logo'/></a>
+         <a href='http://www.dundee.ac.uk'><img src='/images/logo-white_150.png' width='150' alt='University of Dundee logo'/></a>
+         <img style='padding-left:15px' src="/images/RNAit2_150.png" width='75' alt="RNAit2"/>
        </div><!--col-md-10-->
        <div class='col-md-6'>
-         <h1>RNAit: RNAi target selection for Trypanosome genomes</h1>
+         <h1>RNAi target selection for Trypanosome genomes</h1>
        </div>
       </div><!--row-->
       <p></p>
