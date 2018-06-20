@@ -52,8 +52,17 @@ h2 {
 .alert-success {
     background-color:#c4ebd0 !important;
 }
-/*.card-header {
-   background-color:#d1e2f2 !important; /*blue*/
-   /* background-color:#ddd9d6 !important;*/ /*gray*/
-   
-}*/
+.alert-primary {
+    background-color:#4365e2 !important;
+    color:#ffffff !important;
+    font-weight: 200 !important;
+}
+
+.help {
+    float:right;
+    vertical-align:middle;
+    cursor:pointer;
+}
+.help :hover {
+    color:#4365e2;
+}

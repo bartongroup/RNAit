@@ -8,6 +8,13 @@
     <link rel="shortcut icon" href="/favicon.ico">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    <script src="/js/fontawesome-all.min.js"></script>
+    <script>
+      function helpToggle(x,button) {
+        div=document.getElementById(x);
+        if (div.style.display=='none'){div.style.display='block';button.style.color='4365e2';} else {div.style.display='none';button.style.color="#000";}
+      }
+    </script>
     
     <title>RNAit</title>
   </head>
@@ -27,11 +34,12 @@
           <form id='RNAit' method='POST' enctype='multipart/form-data' class='needs-validation' action='/RNAit/query.py' onreset='set_default_vals();' novalidate>
             <div class='card'>
               <h2 class='card-header'>
+                <span class='fas fa-question-circle help' onclick='helpToggle("seqinput_help",this);'></span>
                 Sequence Input
               </h2>
               <div class='card-body'>
                 <div class='form-group row'>
-                  <label class='col-md-3 col-form-label' for='seqpaste'>Paste DNA sequence<br/>(fasta format)</label>
+                  <label class='col-md-3 col-form-label' for='seqpaste'>Paste fasta format DNA sequence</label>
                   <div class='col-md-9'>
                     <div class='row'>
                       <textarea id='seqpaste' name='seqpaste' class='form-control' aria-describedby='seqpaste_info'></textarea>
@@ -49,6 +57,16 @@
                     </div>
                   </div>
                 </div>
+                <div id='seqinput_help' style='display:none' class='row alert alert-primary'>
+                  The sequence of the gene to be
+                  targeted should be entered, either by pasting the sequence
+                  into the top field, or selecting a file from your computer to
+                  upload. The sequence should be provided in fasta format, where
+                  the first line of the record beings with a '>' followed by the
+                  sequence id, with the sequence on the subsequent lines
+                  i.e.<br/><br/><span style='font-family:
+                  monospace'>&gt;seq_id<br/>CTGCTAGTGATAGTCGATGCTAGTCTGACG</span>.
+                </div>
               </div>
             </div>
             
@@ -57,7 +75,10 @@
             <div class='row'>
               <div class='col-md-6'>
                 <div class='card'>
-                  <h2 class='card-header'>Primer Selection</h2>
+                  <h2 class='card-header'>
+                   <span class='fas fa-question-circle help' onclick='helpToggle("primer_help",this);'></span>
+                   Primer Selection
+                  </h2>
                   <div class='card-body'>
                     <div class='form-group row'>
                       <label class='col-md-3 col-form-label' for='melting_temp' aria-describedby='melting_temp_info'>
@@ -65,7 +86,7 @@
                       </label>
                       <div class='col-md-6'>
                         <small id='melting_temp_info'>Required melting temperature of primer pair</small>
-                        <input type='range' id='melting_temp' name='melting_temp' class='form-contol col' min='50' max='75' value='60' oninput='melting_temp_out.value=melting_temp.value + "ºC"'/>
+                        <input type='range' id='melting_temp' name='melting_temp' class='form-contol col' min='55' max='65' value='60' oninput='melting_temp_out.value=melting_temp.value + "ºC"'/>
                         <output id='melting_temp_out'>60ºC</output>
                       </div><!--col-md-6-->
                     </div><!--form-group-row-->
@@ -83,6 +104,23 @@
                     <div class='row'> <!-- dummy row to match height of blast parameters card -->
                     <p style='line-height:0.8'>&nbsp;</p>
                     </div> <!-- row -->
+                   <div id='primer_help' style='display:none' class='row alert alert-primary'>
+                    <p>
+                     Parameters in this section affect the behaviour of primer3
+                     when designing primer pairs.
+                    </p>
+                    <p>
+                     <em>Melting temperature</em> defines the target
+                     temperature at which the DNA duplex dissociates to single
+                     stranded DNA. Lower melting temperatures are more likely to
+                     result in non-specific primer binding, while an increased
+                     melting temperature can increase primer specificity.
+                    </p>
+                    <p>
+                     <em>PCR product size</em> minimum and maximum values define
+                     an acceptable range of sizes for the resutling PCR product.
+                    </p>
+                   </div>
                   </div><!--card-body-->
                 </div><!--card-->
               </div><!--col-md-6-->
@@ -90,6 +128,7 @@
               <div class='col-md-6'>
                 <div class='card'>
                   <h2 class='card-header'>
+                   <span class='fas fa-question-circle help' onclick='helpToggle("blast_help",this);'></span>
                     Blast Parameters
                   </h2>
                   <div class='card-body'>
@@ -97,7 +136,7 @@
                       <div class='col-md-3 col-form-label'>Stringency</div>
                         <div class='col-md-4'>
                           <small id='string_min_info'>Minimum similarity</small>
-                          <input type='range' id='string_min' name='string_min' aria-describedby='string_min_info' class='form-control col' min='80' max='99' value='89' oninput=';string_min_out.value=string_min.value + "%"'/>
+                          <input type='range' id='string_min' name='string_min' aria-describedby='string_min_info' class='form-control col' min='80' max='99' value='89' oninput='string_min_out.value=string_min.value + "%"'/>
                           <output id='string_min_out'>89%</output>
                         </div>
                         <div class='col-md-4'>
@@ -135,7 +174,31 @@
                         </select>
                         <div class='invalid-feedback'>Please select a database</div>
                       </div> <!--col-md-4-->
-                    </div><!--form-group row-->
+                     </div><!--form-group row-->
+                     <div id='blast_help' style='display:none' class='row alert alert-primary'>
+                      <p>
+                        Parameters in this section affect how the PCR product
+                        resulting from each primer pair is assessed using Blast.
+                      </p>
+                      <p>
+                       <em>Stringency</em> defines the minimum and maximum
+                       percetange identity for a blast hit to be considered
+                       conflicting (and would consequently adversely affect
+                       RNAi). Hits of >99% identity covering >95% of the product
+                       are considered 'self' hits if only one such match is
+                       found, and most likely result from the predicted product
+                       matching itself in the database.
+                      </p>
+                      <p>
+                       <em>Subunit length</em> defines the minimum length of
+                       sequence with >100% identity to be permitted. Longer
+                       stretches of identical sequence may also adversely affect
+                       RNAi.
+                      </p>
+                      <p><em>Database</em> selects the organsism database to be
+                      used for similarity searches.
+                      </p>
+                     </div> <!--blast help-->
                   </div><!--card-body-->
                 </div><!--card-->
               </div> <!--col-md-6-->
@@ -219,3 +282,4 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   </body>
 </html>
+
