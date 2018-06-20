@@ -219,6 +219,8 @@ def get_primer_pairs(params):
         'PRIMER_TASK': 'generic',
         'PRIMER_PRODUCT_SIZE_RANGE': [[int(params.get('product_min')), int(params.get('product_max'))]],
         'PRIMER_OPT_TM': int(params.get('melting_temp')),
+        'PRIMER_MAX_TM': 65,
+        'PRIMER_MIN_TM': 55,
     }
 
     primers = {}
