@@ -149,8 +149,8 @@
                             <tr><th>Impact</th><th>Description</th><th>Subject<br/>Length</th><th>Alignment<br/>Length</th><th>Num HSPs</th><th>Identity (%)</th><th>View</th></tr>
                             {% for hit in blast[loop.index-1].self_alignments %}
                             <tr>
-                              <td data-toggle='tooltip' title='{{ hit.status }}' data-placement='top'>
-                                <i class='fas {% if hit.status=='Self alignment' %}fa-thumbs-up{% else %}fa-thumbs-down{% endif %}'></i>
+                              <td data-toggle='tooltip' title='{% if blast[loop.index-1].self_hits > 1 %} Multiple self hits {% else %}{{ hit.status }}{% endif %}' data-placement='top'>
+                                <i class='fas {% if hit.status=='Self alignment' and blast[loop.index-1].self_hits == 1 %}fa-thumbs-up{% else %}fa-thumbs-down{% endif %}'></i>
                               </td>
                               <td>{{ hit.description }}</td>
                               <td>{{ hit.subj_length }}</td>

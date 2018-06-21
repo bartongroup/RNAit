@@ -367,9 +367,11 @@ def blast_product(product, tmp_dir, db, string_min,
     matching_alignments = []
     reasons = []
 
-    # flag for tracking conflicting hits identified
+    # counter for tracking number of self hits
+    selfhits = 0
+    # counter for tracking conflicting hits identified
     conflicting = 0
-    # flag for tracking hits with match exceeding subunit length
+    # counter for tracking hits with match exceeding subunit length
     matching = 0
 
     for alignment in blast_record.alignments:
@@ -413,6 +415,9 @@ def blast_product(product, tmp_dir, db, string_min,
             if (hsp_idents[0] > 0.99 and length_cov == 1):
                 alignment_status = 'Self alignment'
                 self_alignments.append(alignment_data)
+                selfhits += 1
+                if selfhits > 1:
+                    reasons.append('Multiple self hits')
             elif (hsp_idents[0] * 100 > string_min and hsp_idents[0] * 100 < string_max):
                 alignment_status = 'Conflicting hits'
                 conflicting_alignments.append(alignment_data)
@@ -438,7 +443,9 @@ def blast_product(product, tmp_dir, db, string_min,
         alignment_data['hsp_alignments'] = hsp_alignments
         alignment_data['hsp_hit_lengths'] = ";".join(map(str, hsp_hit_lengths))
 
-    if conflicting:
+    if selfhits > 1:
+        primer_status = 'Bad'
+    elif conflicting:
         primer_status = 'Bad'
     elif matching:
         primer_status = 'Bad'
@@ -448,6 +455,7 @@ def blast_product(product, tmp_dir, db, string_min,
     blast_data = {
         'record': blast_record,
         'primer_status': primer_status,
+        'self_hits': selfhits,
         'self_alignments': self_alignments,
         'conflicting_alignments': conflicting_alignments,
         'matching_alignments': matching_alignments,
