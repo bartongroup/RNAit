@@ -23,7 +23,7 @@
     });
   }, false);
 })();
- function set_default_vals() {
+function display_vals() {
   melting_temp_out.value=melting_temp.value + "ºC";
   string_min_out.value=string_min.value + "%";
   string_max_out.value=string_max.value + "%";

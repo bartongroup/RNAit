@@ -9,11 +9,10 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
     <script src="/js/fontawesome-all.min.js"></script>
-    <script src="js/RNAit.js"></script>
-    
+    <script src="/js/RNAit.js"></script>
     <title>RNAit</title>
   </head>
-  <body onload='set_default_vals()'>
+  <body onpageshow='display_vals()'>
     <div class='container'>
       <div class='row header'>
        <div class='col-md-6 '>
@@ -85,7 +84,7 @@
                       <div class='col-md-6'>
                         <small id='melting_temp_info'>Required melting temperature of primer pair</small>
                         <input type='range' id='melting_temp' name='melting_temp' class='form-contol col' min='55' max='65' value='60' oninput='melting_temp_out.value=melting_temp.value + "ºC"'/>
-                        <output id='melting_temp_out'>60ºC</output>
+                        <output id='melting_temp_out'></output>
                       </div><!--col-md-6-->
                     </div><!--form-group-row-->
                     <div class='form-group row'>
@@ -135,12 +134,12 @@
                         <div class='col-md-4'>
                           <small id='string_min_info'>Minimum similarity</small>
                           <input type='range' id='string_min' name='string_min' aria-describedby='string_min_info' class='form-control col' min='80' max='99' value='89' oninput='string_min_out.value=string_min.value + "%"'/>
-                          <output id='string_min_out'>89%</output>
+                          <output id='string_min_out'></output>
                         </div>
                         <div class='col-md-4'>
                           <small id='string_max_info'>Maximum similarity</small>
                           <input type='range' id='string_max' name='string_max' aria-describedby='string_max_info' class='form-control col' min='80' max='99' value='99'  oninput='string_max_out.value=string_max.value + "%";'/>
-                          <output id='string_max_out'>99%</output>
+                          <output id='string_max_out'></output>
                         </div>
                     </div> <!-- row -->
                     <div class='form-group row'>
