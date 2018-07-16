@@ -40,7 +40,8 @@ def application(environ, start_response):
         return(get_error_page(RNAit_dir, params.get('error'), 'submission'))
 
     seq = params.get('seq')
-    db = ('%s%s' % (db_dir, params.get('database')))
+    db = params.get('database')
+
     primers, error = get_primer_pairs(params)
     # capture query parameters for display on results page
     query_info = {

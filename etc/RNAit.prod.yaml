@@ -1,4 +1,3 @@
 RNAit_dir: /var/www/uwsgi/dag.compbio.dundee.ac.uk/RNAit/
-db_dir: /var/www/uwsgi/dag.compbio.dundee.ac.uk/RNAit/databases/
 tmp_dir: /tmp
   
