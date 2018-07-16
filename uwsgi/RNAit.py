@@ -26,7 +26,7 @@ def application(environ, start_response):
     config_file = (
         os.path.dirname(
             os.path.realpath(__file__)) +
-        '/../etc/RNAit.yaml')
+        '/RNAit.yaml')
     with open(config_file) as s:
         config = yaml.safe_load(s)
 
