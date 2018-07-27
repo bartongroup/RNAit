@@ -13,9 +13,11 @@ h1 {
     font-weight:300;
     font-size:1.25rem;
     color: #fff;
-    float:right;
+    float:left:
     display:inline-block;
-    line-height:50px;
+    position:relative;
+    top: 50%;
+    transform: translateY(-50%);
     vertical-align:middle;
 }
 h2 {
