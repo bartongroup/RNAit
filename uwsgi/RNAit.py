@@ -350,7 +350,8 @@ def blast_product(product, tmp_dir, db, string_min,
         out=outFileName,
         outfmt=5,
         db=db,
-        evalue=0.01)
+        task='blastn'
+    )
     stderr = ''
     try:
         stdout, stderr = cline()
@@ -362,6 +363,7 @@ def blast_product(product, tmp_dir, db, string_min,
 
     blast_record = NCBIXML.read(result_handle)
     midline_regex = re.compile(r"\|{20,}")
+    ident_regex = re.compile(r"\|5,}")
     alignment_status = ''
     self_alignments = []
     conflicting_alignments = []
@@ -398,10 +400,18 @@ def blast_product(product, tmp_dir, db, string_min,
 
         for hsp in alignment.hsps:
             hsp_count += 1
+            have_20 = 0
             # check for matches of >20bp identity by checking for stretches of
             # >20 '|' characters in the HSP midline
             match = midline_regex.search(hsp.match)
-            match_len = match.end() - match.start()
+            if match:
+                match_len = match.end() - match.start()
+                have_20 = 1
+            else:
+                match = ident_regex.search(hsp.match)
+                if match:
+                    match_len = match.end() - match.start()
+
             ident = (hsp.identities / hsp.align_length)
             hsp_idents.append(ident)
             hsp_match_lengths.append(match_len)
@@ -413,13 +423,13 @@ def blast_product(product, tmp_dir, db, string_min,
 
         if (hsp_count == 1):
             length_cov = hsp_match_lengths[0] / blast_record.query_letters
-            if (hsp_idents[0] > 0.99 and length_cov == 1):
+            if (have_20 == 1 and hsp_idents[0] > 0.99 and length_cov == 1):
                 alignment_status = 'Self alignment'
                 self_alignments.append(alignment_data)
                 selfhits += 1
                 if selfhits > 1:
                     reasons.append('Multiple self hits')
-            elif (hsp_idents[0] * 100 > string_min and hsp_idents[0] * 100 < string_max):
+            elif (have_20 == 1 and hsp_idents[0] * 100 > string_min and hsp_idents[0] * 100 < string_max):
                 alignment_status = 'Conflicting hits'
                 conflicting_alignments.append(alignment_data)
                 conflicting += 1
