@@ -362,7 +362,7 @@ def blast_product(product, tmp_dir, db, string_min,
     status = ''
 
     blast_record = NCBIXML.read(result_handle)
-    midline_regex = re.compile(r"\|{20,}")
+    midline_regex = r"\|{" + str(subunit_length) + r",}"
     ident_regex = re.compile(r"\|5,}")
     alignment_status = ''
     self_alignments = []
@@ -385,6 +385,7 @@ def blast_product(product, tmp_dir, db, string_min,
             'subj_length': alignment.length,
         }
         hsp_count = 0
+        match_len = 0
         hsp_idents = []
         # lengths of consecutive bases...
         hsp_match_lengths = []
@@ -403,7 +404,7 @@ def blast_product(product, tmp_dir, db, string_min,
             have_20 = 0
             # check for matches of >20bp identity by checking for stretches of
             # >20 '|' characters in the HSP midline
-            match = midline_regex.search(hsp.match)
+            match = re.search(midline_regex, hsp.match)
             if match:
                 match_len = match.end() - match.start()
                 have_20 = 1
@@ -423,7 +424,7 @@ def blast_product(product, tmp_dir, db, string_min,
 
         if (hsp_count == 1):
             length_cov = hsp_match_lengths[0] / blast_record.query_letters
-            if (have_20 == 1 and hsp_idents[0] > 0.99 and length_cov == 1):
+            if (have_20 == 1 and hsp_idents[0] > 0.99 and length_cov >= 1):
                 alignment_status = 'Self alignment'
                 self_alignments.append(alignment_data)
                 selfhits += 1
