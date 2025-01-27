@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-WEBHOST='www-prod.compbio.dundee.ac.uk'
+WEBHOST='dag-dev'
 HTMLDIR='/var/www/html/dag.compbio.dundee.ac.uk/'
 UWSGIDIR='/var/www/uwsgi/dag.compbio.dundee.ac.uk/RNAit/'
 
@@ -23,7 +23,7 @@ echo "==================="
 echo
 
 ssh $WEBHOST "chmod 0755 $HTMLDIR/RNAit"
-ssh $WEBROOT "chmod 0744 $HTMLDIR/RNAit/index.html"
+ssh $WEBHOST "chmod 0744 $HTMLDIR/RNAit/index.html"
 ssh $WEBHOST "chmod 0744 $HTMLDIR/images/*"
 ssh $WEBHOST "chmod 0744 $HTMLDIR/css/RNAit.css"
 ssh $WEBHOST "chmod 0744 $HTMLDIR/js/RNAit.js"
